@@ -1,0 +1,23 @@
+  mixpost:
+    image: inovector/mixpost-pro-team:latest
+    container_name: mixpost
+      - LICENSE_KEY=yoeya4oEyrmiEEDKZGr2RtMTJVQJhBkpaPuT8EXAL1NOsZVUEFrUMzSxt5Vy7i1J
+      - APP_NAME=Mixpost
+      - APP_KEY=base64:mSkK0ldNzh0XYDc0QiCkEGDcvbTTVbIfY3m3UssGvAU=
+      - APP_URL=https://social.everydaycreator.org
+      - APP_DOMAIN=social.everydaycreator.org
+      - SESSION_DOMAIN=.everydaycreator.org
+      - SSL_EMAIL=${LETSENCRYPT_EMAIL:-admin@everydaycreator.org}
+      - DB_DATABASE=mixpost
+      - DB_USERNAME=mixpost
+      - DB_PASSWORD=${MYSQL_PASSWORD:-MixPostDB2025!}
+      - MAIL_MAILER=${N8N_SMTP_HOST:+smtp}
+      - MAIL_HOST=${N8N_SMTP_HOST:-localhost}
+      - MAIL_PORT=${N8N_SMTP_PORT:-587}
+      - MAIL_USERNAME=${N8N_SMTP_USER:-}
+      - MAIL_PASSWORD=${N8N_SMTP_PASS:-}
+      - MAIL_ENCRYPTION=${N8N_SMTP_SSL:-tls}
+      - MAIL_FROM_ADDRESS=${N8N_SMTP_SENDER:-noreply@everydaycreator.org}
+      - MAIL_FROM_NAME=Mixpost
+    volumes:
+      - mixpost_storage:/var/www/html/storage/app

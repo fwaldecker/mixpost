@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, watch } from 'vue';
+import {computed, onMounted, onUnmounted, watch} from 'vue';
 
 const props = defineProps({
     show: {
@@ -16,6 +16,10 @@ const props = defineProps({
     },
     dialogClass: {
         type: String,
+    },
+    zIndexClass: {
+        type: String,
+        default: 'z-30'
     }
 });
 
@@ -55,6 +59,9 @@ const maxWidthClass = computed(() => {
         'lg': 'sm:max-w-(--container-lg)',
         'xl': 'sm:max-w-(--container-xl)',
         '2xl': 'sm:max-w-(--container-2xl)',
+        '3xl': 'sm:max-w-(--container-3xl)',
+        '4xl': 'sm:max-w-(--container-4xl)',
+        '5xl': 'sm:max-w-(--container-5xl)',
     }[props.maxWidth];
 });
 </script>
@@ -62,7 +69,7 @@ const maxWidthClass = computed(() => {
 <template>
     <teleport to="body">
         <transition leave-active-class="duration-200">
-            <div v-show="show" class="fixed inset-0 overflow-y-auto px-sm py-lg sm:px-0 z-40" scroll-region>
+            <div v-show="show" :class="[zIndexClass]" class="fixed inset-0 overflow-y-auto px-sm py-lg sm:px-0" scroll-region>
                 <transition
                     enter-active-class="ease-out duration-300"
                     enter-from-class="opacity-0"
@@ -71,8 +78,8 @@ const maxWidthClass = computed(() => {
                     leave-from-class="opacity-100"
                     leave-to-class="opacity-0"
                 >
-                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
-                        <div class="absolute inset-0 bg-indigo-900 opacity-60" />
+                    <div v-show="show" class="fixed inset-0 transform-[translateX(--spacing(0))] transition-all" @click="close">
+                        <div class="absolute inset-0 bg-black/60" />
                     </div>
                 </transition>
 

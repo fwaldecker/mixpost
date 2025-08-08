@@ -1,3 +1,3 @@
 <template>
-    <div class="w-full text-lg"><slot/></div>
+    <div class="text-lg font-medium"><slot/></div>
 </template>

@@ -32,6 +32,13 @@ class EagerLoadPostVersionsMedia
                                 }
                             }
                         }
+                        if (isset($item['video_thumbs']) && is_array($item['video_thumbs'])) {
+                            $item['video_thumb_media'] = [];
+
+                            foreach ($item['video_thumbs'] as $videoThumb) {
+                                $item['video_thumb_media'][$videoThumb['media_id']] = $this->mediaCollection[$videoThumb['thumb_id']];
+                            }
+                        }
                     }
                 }
 
@@ -56,6 +63,13 @@ class EagerLoadPostVersionsMedia
                         if (isset($item['media']) && is_array($item['media'])) {
                             $mediaIds = array_merge($mediaIds, $item['media']);
                         }
+                        if (isset($item['video_thumbs']) && is_array($item['video_thumbs'])) {
+                            $thumbnailMediaIds = [];
+                            foreach ($item['video_thumbs'] as $videoThumb) {
+                                $thumbnailMediaIds[] = $videoThumb['thumb_id'];
+                            }
+                            $mediaIds = array_merge($mediaIds, $thumbnailMediaIds);
+                        }
                     }
                 }
             });
@@ -68,7 +82,7 @@ class EagerLoadPostVersionsMedia
     {
         $mediaIds = $this->extractMediaIds();
 
-        if (empty($mediaIds)) {
+        if(empty($mediaIds)) {
             return collect();
         }
 

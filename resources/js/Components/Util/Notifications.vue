@@ -105,7 +105,7 @@ watch(() => flash.value, () => {
                     leave-from-class="transform opacity-100 scale-100"
                     leave-to-class="transform opacity-0 scale-95">
             <div v-show="show"
-                 class="absolute bottom-0 right-0 ml-sm md:ml-0 mr-sm md:mr-xl mb-2xl flex px-lg py-md rounded-md bg-indigo-800 shadow-mix z-50"
+                 class="absolute bottom-0 right-0 ml-sm md:ml-0 mr-sm md:mr-xl mb-2xl flex px-lg py-md rounded-md bg-alert shadow-mix z-50"
                  aria-live="polite">
                 <div class="flex items-center">
                     <div>
@@ -115,7 +115,7 @@ watch(() => flash.value, () => {
                         </div>
                     </div>
                     <div>
-                        <div class="text-gray-200" v-html="message"/>
+                        <div class="text-alert-context" v-html="message"/>
                         <div v-if="button" class="mt-xs">
                             <Link :href="button.href">
                                 <SecondaryButton @click="close">{{ button.name }}</SecondaryButton>
@@ -123,7 +123,7 @@ watch(() => flash.value, () => {
                         </div>
                     </div>
                     <button @click="close" class="ml-2xl rtl:ml-0 rtl:mr-2xl hover:rotate-90 transition-transform ease-in-out duration-300">
-                        <XIcon class="text-gray-200"/>
+                        <XIcon class="text-alert-context"/>
                     </button>
                 </div>
             </div>

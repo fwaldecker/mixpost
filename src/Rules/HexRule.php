@@ -2,31 +2,19 @@
 
 namespace Inovector\Mixpost\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class HexRule implements Rule
+class HexRule implements ValidationRule
 {
     protected bool $forceFull;
 
-    /**
-     * Create a new rule instance.
-     *
-     * @return void
-     */
     public function __construct(bool $forceFull = false)
     {
         $this->forceFull = $forceFull;
     }
 
-
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $pattern = '/^#([a-fA-F0-9]{6}';
 
@@ -36,16 +24,8 @@ class HexRule implements Rule
 
         $pattern .= ')$/';
 
-        return (bool)preg_match($pattern, $value);
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'The hex code is not valid';
+        if (!preg_match($pattern, $value)) {
+            $fail('mixpost::rules.hex.code_invalid')->translate();
+        }
     }
 }

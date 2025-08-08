@@ -1,6 +1,7 @@
 <script setup>
 import Panel from "@/Components/Surface/Panel.vue";
-import ChartBar from "@/Components/Package/ChartBar.vue";
+import {computed} from "vue";
+import ChartTrend from "../Chart/ChartTrend.vue";
 
 const props = defineProps({
     data: {
@@ -20,50 +21,49 @@ const getMetricCount = (value) => {
 const getAudienceData = (value) => {
     return props.data.audience.hasOwnProperty(value) ? props.data.audience[value] : []
 }
+
+const chartData = computed(() => {
+    return {
+        labels: getAudienceData('labels'),
+        aggregates: getAudienceData('values'),
+    }
+})
 </script>
 <template>
     <div class="row-px mt-2xl">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
-            <!--            Facebook deprecated `page_engaged_users` metric-->
+<!--            Facebook deprecated `page_engaged_users` metric-->
 <!--            <Panel>-->
-<!--                <template #title><span v-tooltip="'The number of people who engaged with your Page. Engagement includes any click.'">Page Engaged Users</span>-->
+<!--                <template #title><span-->
+<!--                    v-tooltip="$t('service.facebook.report.number_people_page')">{{ $t('service.facebook.report.page_engaged_users') }}</span>-->
 <!--                </template>-->
-<!--                <div class="font-bold text-indigo-500 text-2xl">{{ getMetricCount('page_engaged_users') }}</div>-->
+<!--                <div class="font-bold text-primary-500 text-2xl">{{ getMetricCount('page_engaged_users') }}</div>-->
 <!--            </Panel>-->
 
             <Panel>
-                <template #title><span v-tooltip="'The number of times people have engaged with your posts through reactions, comments, shares and more.'">Post Engagements</span>
+                <template #title><span
+                    v-tooltip="$t('service.facebook.report.number_times_post_engagements')">{{ $t('service.facebook.report.post_engagements') }}</span>
                 </template>
-                <div class="font-bold text-indigo-500 text-2xl">{{ getMetricCount('page_post_engagements') }}</div>
+                <div class="font-bold text-primary-500 text-2xl">{{ getMetricCount('page_post_engagements') }}</div>
             </Panel>
 
             <Panel>
-                <template #title><span v-tooltip="'The number of times your Page\'s posts entered a person\'s screen. Posts include statuses, photos, links, videos and more.'">Posts Impressions</span>
+                <template #title><span
+                    v-tooltip=" $t('service.facebook.report.number_times_posts_impressions') ">{{ $t('service.facebook.report.posts_impressions') }}</span>
                 </template>
-                <div class="font-semibold text-indigo-500 text-2xl">{{ getMetricCount('page_posts_impressions') }}</div>
+                <div class="font-semibold text-primary-500 text-2xl">{{
+                        getMetricCount('page_posts_impressions')
+                    }}
+                </div>
             </Panel>
         </div>
     </div>
 
     <div class="row-px mt-2xl">
         <Panel>
-            <template #title>Audience</template>
-            <template #description>The number of followers per day during the selected period</template>
-            <ChartBar :data="{
-                labels: getAudienceData('labels'),
-                datasets: [
-                    {
-                        label: 'Followers',
-                        type: 'line',
-                        data: getAudienceData('values'),
-                        borderColor: '#3F3795',
-                        pointBackgroundColor: '#4F46BB',
-                        pointBorderColor: '#4F46BB',
-                        yAxisID: 'y1',
-                        order: 0,
-                    }
-                ]
-            }"/>
+            <template #title>{{ $t('report.audience') }}</template>
+            <template #description>{{ $t('report.followers_per_day') }}</template>
+            <ChartTrend :label="$t('report.followers')" :labels="chartData.labels" :aggregates="chartData.aggregates"/>
         </Panel>
     </div>
 </template>

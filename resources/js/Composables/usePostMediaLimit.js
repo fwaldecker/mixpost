@@ -35,11 +35,13 @@ export default function usePostMediaLimit(props) {
 
     const getLowestMaxMediaLimits = (version) => {
         const results = {};
+        const versionObj = props.versions.find(versionItem => versionItem.account_id === version);
         const accounts = version === 0 ? accountsWithoutVersion.value : props.selectedAccounts.filter(account => account.id === version);
 
         mediaTypesAll.forEach(mediaType => {
             const accountsLimit = accounts.map(account => {
-                const limit = getMediaLimitForType('max', mediaType, 'default', account);
+                const type = versionObj?.options[account.provider]?.type || 'default';
+                const limit = getMediaLimitForType('max', mediaType, type, account);
 
                 return {
                     account_id: account.id,
@@ -83,6 +85,8 @@ export default function usePostMediaLimit(props) {
             } else {
                 results[mediaType] = null;
             }
+
+            // results[mediaType] = accountsLimit.length ? maxBy(accountsLimit, 'limit') : null;
         });
 
         return !isEmpty(results) ? results : null;
@@ -134,6 +138,7 @@ export default function usePostMediaLimit(props) {
 
     const currentMedia = computed(() => getEnabledVersions().find(version => version.account_id === props.activeVersion)?.content[props.activeContent]?.media);
     const currentMediaMaxLimits = computed(() => getMediaMaxLimits(props.activeVersion));
+    // const currentMediaMinLimits = computed(() => getMediaMinLimits(props.activeVersion));
     const currentMediaUsed = computed(() => getMediaLength(currentMedia.value));
 
     return {
@@ -141,6 +146,7 @@ export default function usePostMediaLimit(props) {
         mediaTypesBasic,
         currentMedia,
         currentMediaMaxLimits,
+        // currentMediaMinLimits,
         currentMediaUsed,
         getMediaMaxLimits,
         getMediaMinLimits,

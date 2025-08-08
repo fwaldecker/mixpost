@@ -1,0 +1,355 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Get data from previous nodes\nconst airtableRecord = $input.first().json;\n\n// Extract content fields\nconst content = airtableRecord.Description || airtableRecord.content || '';\nconst title = airtableRecord.Title || '';\nconst imageAttachments = airtableRecord['📥 Image'] || [];\nconst videoAttachments = airtableRecord['📥 Video'] || [];\nconst publishDate = airtableRecord['Publish Date'];\nconst publishNow = airtableRecord['Publish Now'] === true;\nconst platforms = airtableRecord.Platforms || [];\n\n// Extract URLs from Airtable attachments\nconst imageUrls = imageAttachments.map(att => att.url || att);\nconst videoUrls = videoAttachments.map(att => att.url || att);\n\n// Determine scheduling and if it should be a story\nlet scheduleData = {};\nlet shouldBeStory = false;\n\nif (publishNow) {\n  scheduleData = {\n    schedule_now: true,\n    schedule: false,\n    queue: false\n  };\n} else if (publishDate) {\n  const date = new Date(publishDate);\n  scheduleData = {\n    date: date.toISOString().split('T')[0], // YYYY-MM-DD\n    time: date.toTimeString().split(' ')[0].substring(0, 5), // HH:MM\n    timezone: 'America/New_York', // Adjust to your timezone\n    schedule: true,\n    schedule_now: false,\n    queue: false\n  };\n} else {\n  // Add to queue if no date - and mark as story for FB/IG\n  scheduleData = {\n    queue: true,\n    schedule: false,\n    schedule_now: false\n  };\n  shouldBeStory = true;\n}\n\n// Prepare media info for processing\nconst mediaInfo = {\n  images: imageUrls,\n  videos: videoUrls,\n  hasMedia: imageUrls.length > 0 || videoUrls.length > 0\n};\n\nreturn {\n  content,\n  title,\n  mediaInfo,\n  platforms,\n  shouldBeStory,\n  ...scheduleData,\n  recordId: airtableRecord.id,\n  rawRecord: airtableRecord\n};"
+      },
+      "id": "prepare-mixpost-data",
+      "name": "Prepare Mixpost Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://social.everydaycreator.org/mixpost/api/dd7477ef-bcd2-45dd-8f2e-14e790fdd2e2/accounts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YwNO7dcJiIs7o0r9hwgqg8HoamYjIZoh0pLmpz8y67681cb9"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-mixpost-accounts",
+      "name": "Get Mixpost Accounts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [620, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-media",
+              "leftValue": "={{ $('Prepare Mixpost Data').item.json.mediaInfo.hasMedia }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-media",
+      "name": "Has Media?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [820, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const preparedData = $('Prepare Mixpost Data').item.json;\nconst mediaInfo = preparedData.mediaInfo;\nconst uploadPromises = [];\n\n// Prepare all media items for upload\nconst allMedia = [];\n\n// Add images\nmediaInfo.images.forEach((url, index) => {\n  allMedia.push({\n    url,\n    type: 'image',\n    index\n  });\n});\n\n// Add videos\nmediaInfo.videos.forEach((url, index) => {\n  allMedia.push({\n    url,\n    type: 'video',\n    index\n  });\n});\n\n// Return items for individual processing\nreturn allMedia.map(media => ({\n  json: {\n    mediaUrl: media.url,\n    mediaType: media.type,\n    mediaIndex: media.index,\n    originalData: preparedData\n  }\n}));"
+      },
+      "id": "prepare-media-uploads",
+      "name": "Prepare Media Uploads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1020, 240]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://social.everydaycreator.org/mixpost/api/dd7477ef-bcd2-45dd-8f2e-14e790fdd2e2/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YwNO7dcJiIs7o0r9hwgqg8HoamYjIZoh0pLmpz8y67681cb9"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "value": "={{ $json.mediaUrl }}",
+              "inputDataFieldName": "file"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "upload-media",
+      "name": "Upload Media to Mixpost",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1220, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate uploaded media results\nconst uploadedMedia = $input.all();\nconst preparedData = $('Prepare Mixpost Data').item.json;\nconst accounts = $('Get Mixpost Accounts').item.json;\n\n// Extract account IDs based on platform names\nconst platformMapping = {\n  'Facebook': 'facebook_page',\n  'Instagram': 'instagram',\n  'YouTube': 'youtube',\n  'Twitter': 'twitter',\n  'X': 'twitter'\n};\n\n// Filter accounts based on selected platforms\nconst selectedAccountIds = [];\nif (preparedData.platforms && preparedData.platforms.length > 0) {\n  accounts.data.forEach(account => {\n    const platformKey = Object.keys(platformMapping).find(key => \n      preparedData.platforms.includes(key) && \n      account.provider === platformMapping[key]\n    );\n    if (platformKey) {\n      selectedAccountIds.push(account.id);\n    }\n  });\n} else {\n  // If no platforms specified, use all accounts\n  selectedAccountIds.push(...accounts.data.map(acc => acc.id));\n}\n\n// Process uploaded media and determine post types\nconst mediaIds = [];\nconst videoMediaIds = [];\nlet postType = 'post'; // default\nlet hasVerticalVideo = false;\nlet videoTooLongForReel = false;\n\nuploadedMedia.forEach(item => {\n  if (item.json.data && item.json.data.id) {\n    const media = item.json.data;\n    mediaIds.push(media.id);\n    \n    // Check if it's a video and analyze dimensions\n    if (item.json.originalData.mediaType === 'video') {\n      videoMediaIds.push(media.id);\n      \n      // Check if video is vertical (aspect ratio < 1)\n      if (media.metadata && media.metadata.width && media.metadata.height) {\n        const aspectRatio = media.metadata.width / media.metadata.height;\n        if (aspectRatio < 1) {\n          hasVerticalVideo = true;\n          \n          // Check duration for reel eligibility (max 90 seconds for most platforms)\n          if (media.metadata.duration && media.metadata.duration > 90) {\n            videoTooLongForReel = true;\n          }\n        }\n      }\n    }\n  }\n});\n\n// Check if this should be a story (no publish date)\nif (preparedData.shouldBeStory) {\n  postType = 'story';\n} else {\n  // Determine post type based on media\n  if (hasVerticalVideo && !videoTooLongForReel) {\n    postType = 'reel';\n  } else if (videoMediaIds.length > 0) {\n    postType = 'video';\n  } else if (mediaIds.length > 0) {\n    postType = 'image';\n  }\n}\n\n// Build platform-specific options\nconst platformOptions = {};\n\nif (preparedData.platforms.includes('Facebook')) {\n  if (postType === 'story') {\n    platformOptions.facebook_page = { type: 'story' };\n  } else if (postType === 'reel') {\n    platformOptions.facebook_page = { type: 'reel' };\n  } else {\n    platformOptions.facebook_page = { type: 'post' };\n  }\n}\n\nif (preparedData.platforms.includes('Instagram')) {\n  if (postType === 'story') {\n    platformOptions.instagram = { type: 'story' };\n  } else if (postType === 'reel') {\n    platformOptions.instagram = { type: 'reel' };\n  } else {\n    platformOptions.instagram = { type: 'post' };\n  }\n}\n\nif (preparedData.platforms.includes('YouTube') && videoMediaIds.length > 0) {\n  platformOptions.youtube = {\n    title: preparedData.title || preparedData.content.substring(0, 100),\n    status: 'public'\n  };\n}\n\nreturn {\n  mediaIds,\n  videoMediaIds,\n  selectedAccountIds,\n  postType,\n  platformOptions,\n  preparedData\n};"
+      },
+      "id": "process-media-results",
+      "name": "Process Media & Determine Post Type",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1420, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data for posts without media\nconst preparedData = $('Prepare Mixpost Data').item.json;\nconst accounts = $('Get Mixpost Accounts').item.json;\n\n// Extract account IDs based on platform names\nconst platformMapping = {\n  'Facebook': 'facebook_page',\n  'Instagram': 'instagram',\n  'YouTube': 'youtube',\n  'Twitter': 'twitter',\n  'X': 'twitter'\n};\n\n// Filter accounts based on selected platforms\nconst selectedAccountIds = [];\nif (preparedData.platforms && preparedData.platforms.length > 0) {\n  accounts.data.forEach(account => {\n    const platformKey = Object.keys(platformMapping).find(key => \n      preparedData.platforms.includes(key) && \n      account.provider === platformMapping[key]\n    );\n    if (platformKey) {\n      selectedAccountIds.push(account.id);\n    }\n  });\n} else {\n  // If no platforms specified, use all accounts\n  selectedAccountIds.push(...accounts.data.map(acc => acc.id));\n}\n\n// Determine post type based on shouldBeStory flag\nlet postType = 'text';\nconst platformOptions = {};\n\nif (preparedData.shouldBeStory) {\n  postType = 'story';\n  \n  // Set story type for Facebook and Instagram\n  if (preparedData.platforms.includes('Facebook')) {\n    platformOptions.facebook_page = { type: 'story' };\n  }\n  if (preparedData.platforms.includes('Instagram')) {\n    platformOptions.instagram = { type: 'story' };\n  }\n}\n\nreturn {\n  mediaIds: [],\n  videoMediaIds: [],\n  selectedAccountIds,\n  postType,\n  platformOptions,\n  preparedData\n};"
+      },
+      "id": "no-media-processing",
+      "name": "Process Without Media",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1020, 360]
+    },
+    {
+      "parameters": {},
+      "id": "merge-paths",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1620, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://social.everydaycreator.org/mixpost/api/dd7477ef-bcd2-45dd-8f2e-14e790fdd2e2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YwNO7dcJiIs7o0r9hwgqg8HoamYjIZoh0pLmpz8y67681cb9"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ \n  const data = $json;\n  const pd = data.preparedData;\n  \n  const payload = {\n    accounts: data.selectedAccountIds,\n    versions: [\n      {\n        account_id: 0,\n        is_original: true,\n        content: [\n          {\n            body: pd.content,\n            media: data.mediaIds\n          }\n        ],\n        options: data.platformOptions\n      }\n    ]\n  };\n  \n  // Add scheduling fields only if they're needed\n  if (pd.date) payload.date = pd.date;\n  if (pd.time) payload.time = pd.time;\n  if (pd.timezone) payload.timezone = pd.timezone;\n  if (pd.schedule !== undefined) payload.schedule = pd.schedule;\n  if (pd.schedule_now !== undefined) payload.schedule_now = pd.schedule_now;\n  if (pd.queue !== undefined) payload.queue = pd.queue;\n  \n  return JSON.stringify(payload);\n}}",
+        "options": {}
+      },
+      "id": "create-post",
+      "name": "Create Mixpost Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1820, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "={{ $('Prepare Mixpost Data').item.json.rawRecord.baseId || 'YOUR_BASE_ID' }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Prepare Mixpost Data').item.json.rawRecord.tableId || 'YOUR_TABLE_ID' }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Prepare Mixpost Data').item.json.recordId }}",
+            "Status": "Published",
+            "Mixpost ID": "={{ $('Create Mixpost Post').item.json.data.id }}",
+            "Published At": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": ["id"],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "options",
+              "readOnly": false
+            },
+            {
+              "id": "Mixpost ID",
+              "displayName": "Mixpost ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false
+            },
+            {
+              "id": "Published At",
+              "displayName": "Published At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "update-airtable",
+      "name": "Update Airtable Status",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [2020, 300]
+    }
+  ],
+  "connections": {
+    "Prepare Mixpost Data": {
+      "main": [
+        [
+          {
+            "node": "Get Mixpost Accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Mixpost Accounts": {
+      "main": [
+        [
+          {
+            "node": "Has Media?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Media?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Media Uploads",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process Without Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Media Uploads": {
+      "main": [
+        [
+          {
+            "node": "Upload Media to Mixpost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Media to Mixpost": {
+      "main": [
+        [
+          {
+            "node": "Process Media & Determine Post Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Media & Determine Post Type": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Without Media": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Create Mixpost Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Mixpost Post": {
+      "main": [
+        [
+          {
+            "node": "Update Airtable Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

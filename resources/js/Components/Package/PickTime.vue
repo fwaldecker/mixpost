@@ -1,5 +1,6 @@
 <script setup>
 import {ref, onMounted, watch} from "vue";
+import {useI18n} from "vue-i18n";
 import {format, addHours, parseISO} from "date-fns"
 import {utcToZonedTime} from "date-fns-tz";
 import useSettings from "@/Composables/useSettings";
@@ -8,7 +9,7 @@ import DialogModal from "@/Components/Modal/DialogModal.vue"
 import PrimaryButton from "@/Components/Button/PrimaryButton.vue"
 import SecondaryButton from "@/Components/Button/SecondaryButton.vue"
 import ExclamationCircleIcon from "@/Icons/ExclamationCircle.vue"
-import { Link } from '@inertiajs/vue3'
+import {Link} from '@inertiajs/vue3'
 import FlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 import '@css/overrideFlatPickr.css'
@@ -33,6 +34,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'update']);
+
+const { t: $t } = useI18n()
 
 const date = ref();
 const time = ref();
@@ -136,7 +139,57 @@ const configDatePicker = {
     yearSelectorType: 'static',
     static: true,
     locale: {
-        firstDayOfWeek: weekStartsOn
+        firstDayOfWeek: weekStartsOn,
+        weekdays: {
+            shorthand: [
+                $t('calendar.weekdays.sunday.short'),
+                $t('calendar.weekdays.monday.short'),
+                $t('calendar.weekdays.tuesday.short'),
+                $t('calendar.weekdays.wednesday.short'),
+                $t('calendar.weekdays.thursday.short'),
+                $t('calendar.weekdays.friday.short'),
+                $t('calendar.weekdays.saturday.short'),
+            ],
+            longhand: [
+                $t('calendar.weekdays.sunday.full'),
+                $t('calendar.weekdays.monday.full'),
+                $t('calendar.weekdays.tuesday.full'),
+                $t('calendar.weekdays.wednesday.full'),
+                $t('calendar.weekdays.thursday.full'),
+                $t('calendar.weekdays.friday.full'),
+                $t('calendar.weekdays.saturday.full'),
+            ],
+        },
+        months: {
+            shorthand: [
+                $t('calendar.months.january.short'),
+                $t('calendar.months.february.short'),
+                $t('calendar.months.march.short'),
+                $t('calendar.months.april.short'),
+                $t('calendar.months.may.short'),
+                $t('calendar.months.june.short'),
+                $t('calendar.months.july.short'),
+                $t('calendar.months.august.short'),
+                $t('calendar.months.september.short'),
+                $t('calendar.months.october.short'),
+                $t('calendar.months.november.short'),
+                $t('calendar.months.december.short'),
+            ],
+            longhand: [
+                $t('calendar.months.january.full'),
+                $t('calendar.months.february.full'),
+                $t('calendar.months.march.full'),
+                $t('calendar.months.april.full'),
+                $t('calendar.months.may.full'),
+                $t('calendar.months.june.full'),
+                $t('calendar.months.july.full'),
+                $t('calendar.months.august.full'),
+                $t('calendar.months.september.full'),
+                $t('calendar.months.october.full'),
+                $t('calendar.months.november.full'),
+                $t('calendar.months.december.full'),
+            ],
+        },
     },
     prevArrow: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>',
     nextArrow: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>'
@@ -160,22 +213,26 @@ const configTimePicker = {
                 <FlatPickr v-model="date" :config="configDatePicker"/>
 
                 <div class="flex items-center justify-center mx-auto mt-lg">
-                    <div class="mr-xs text-gray-400">Time</div>
+                    <div class="mr-xs text-gray-400">{{ $t('general.time') }}</div>
                     <div class="w-auto" ref="timePicker">
                         <FlatPickr v-model="time" :config="configTimePicker"/>
                     </div>
                 </div>
                 <div class="text-sm flex items-center justify-center mt-sm">
                     <div class="mr-1">{{ timeZone }}</div>
-                    <Link :href="route('mixpost.settings.index')" v-tooltip="'Post will be scheduled according to this timezone. Click to update it.'"><ExclamationCircleIcon class="w-4! h-4!"/></Link>
+                    <Link :href="route('mixpost.profile.index')" v-tooltip="$t('post.post_scheduled_timezone')">
+                        <ExclamationCircleIcon class="w-4! h-4!"/>
+                    </Link>
                 </div>
-                <div v-if="hasErrors" class="mt-xs text-center text-red-500">The selected date and time is in the past</div>
+                <div v-if="hasErrors" class="mt-xs text-center text-red-500">{{ $t('post.past_selected_date') }}
+                </div>
             </div>
         </template>
 
         <template #footer>
-            <SecondaryButton @click="close" class="mr-xs">Cancel</SecondaryButton>
-            <PrimaryButton @click="confirm" :disabled="hasErrors || !isSubmitActive">Pick time</PrimaryButton>
+            <SecondaryButton @click="close" class="mr-xs">{{ $t('general.cancel') }}</SecondaryButton>
+            <PrimaryButton @click="confirm" :disabled="hasErrors || !isSubmitActive">{{ $t('post.pick_time') }}
+            </PrimaryButton>
         </template>
     </DialogModal>
 </template>

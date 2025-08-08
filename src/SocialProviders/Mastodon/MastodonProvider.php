@@ -4,15 +4,19 @@ namespace Inovector\Mixpost\SocialProviders\Mastodon;
 
 use Illuminate\Http\Request;
 use Inovector\Mixpost\Abstracts\SocialProvider;
-use Inovector\Mixpost\Http\Resources\AccountResource;
+use Inovector\Mixpost\Contracts\AccountResource;
+use Inovector\Mixpost\SocialProviders\Mastodon\Concerns\ManagesConfig;
 use Inovector\Mixpost\SocialProviders\Mastodon\Concerns\ManagesOAuth;
 use Inovector\Mixpost\SocialProviders\Mastodon\Concerns\ManagesRateLimit;
 use Inovector\Mixpost\SocialProviders\Mastodon\Concerns\ManagesResources;
+use Inovector\Mixpost\SocialProviders\Mastodon\Support\MastodonPostOptions;
+use Inovector\Mixpost\Contracts\SocialProviderPostOptions;
 use Inovector\Mixpost\Support\SocialProviderPostConfigs;
 use Inovector\Mixpost\Util;
 
 class MastodonProvider extends SocialProvider
 {
+    use ManagesConfig;
     use ManagesRateLimit;
     use ManagesOAuth;
     use ManagesResources;
@@ -49,10 +53,39 @@ class MastodonProvider extends SocialProvider
             ->allowMixingMediaTypes(Util::config('social_provider_options.mastodon.allow_mixing'));
     }
 
+    public static function postOptions(): SocialProviderPostOptions
+    {
+        return new MastodonPostOptions();
+    }
+
     public static function externalPostUrl(AccountResource $accountResource): string
     {
-        $server = $accountResource->data['server'] ?? 'undefined';
+        $server = $accountResource->data['server'] ?? null;
+
+        if (!$server) {
+            return '';
+        }
 
         return "https://$server/@$accountResource->username/{$accountResource->pivot->provider_post_id}";
+    }
+
+    public static function externalAccountUrl(AccountResource $accountResource): string
+    {
+        $server = $accountResource->data['server'] ?? null;
+
+        if (!$server) {
+            return '';
+        }
+
+        return "https://" . $server . '/@' . $accountResource->username;
+    }
+
+    public static function mapErrorMessage(string $key): string
+    {
+        return match ($key) {
+            'access_token_expired' => __('mixpost::account.access_token_expired'),
+            'upload_failed' => __('mixpost::service.mastodon.upload_failed'),
+            default => $key
+        };
     }
 }

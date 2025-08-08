@@ -5,10 +5,12 @@ namespace Inovector\Mixpost\MediaConversions;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use Illuminate\Support\Facades\File;
+use Inovector\Mixpost\Abstracts\Image;
 use Inovector\Mixpost\Abstracts\MediaConversion;
+use Inovector\Mixpost\Support\ImageResizer;
 use Inovector\Mixpost\Support\MediaConversionData;
-use Inovector\Mixpost\Support\MediaFilesystem;
-use Inovector\Mixpost\Support\MediaTemporaryDirectory;
+use Inovector\Mixpost\Support\TemporaryFile;
+use Inovector\Mixpost\Util;
 
 class MediaVideoThumbConversion extends MediaConversion
 {
@@ -38,22 +40,25 @@ class MediaVideoThumbConversion extends MediaConversion
 
     public function handle(): MediaConversionData|null
     {
-        // Create & copy to temporary directory
-        $temporaryDirectory = MediaTemporaryDirectory::create();
+        if(!Util::isFFmpegInstalled()) {
+            return null;
+        }
 
-        $file = $temporaryDirectory->path($this->getFilepath());
-        $thumbFilepath = $this->getFilePathWithSuffix('jpg', $file);
+        $temporaryFile = TemporaryFile::make()->fromDisk(
+            sourceDisk: $this->getFromDisk(),
+            sourceFilepath: $this->getFilepath()
+        );
 
-        MediaFilesystem::copyFromDisk($this->getFilepath(), $this->getFromDisk(), $file);
+        $thumbFilepath = $this->getFilePathWithSuffix('jpg', $temporaryFile->path());
 
         // Convert
         $ffmpeg = FFMpeg::create([
-            'ffmpeg.binaries' => config('mixpost.ffmpeg_path'),
-            'ffprobe.binaries' => config('mixpost.ffprobe_path'),
+            'ffmpeg.binaries' => Util::config('ffmpeg_path'),
+            'ffprobe.binaries' => Util::config('ffprobe_path'),
         ]);
 
-        $video = $ffmpeg->open($file);
-        $duration = $ffmpeg->getFFProbe()->format($file)->get('duration');
+        $video = $ffmpeg->open($temporaryFile->path());
+        $duration = $ffmpeg->getFFProbe()->format($temporaryFile->path())->get('duration');
 
         // Ensure $seconds is within valid bounds
         $seconds = ($duration > 0 && $this->atSecond > 0) ? min($this->atSecond, floor($duration)) : 0;
@@ -68,11 +73,13 @@ class MediaVideoThumbConversion extends MediaConversion
             $frame->save($thumbFilepath);
         }
 
-        // Copy
-        MediaFilesystem::copyToDisk($this->getToDisk(), $this->getPath(), $thumbFilepath);
+        // Resize the thumbnail and save it to the destination disk
+        ImageResizer::make($thumbFilepath)
+            ->disk($this->getToDisk())
+            ->path($this->getPath())
+            ->resize(Image::MEDIUM_WIDTH, Image::MEDIUM_HEIGHT);
 
-        // Delete temporary directory
-        $temporaryDirectory->delete();
+        $temporaryFile->directory()->delete();
 
         return MediaConversionData::conversion($this);
     }

@@ -1,6 +1,7 @@
 <script setup>
 import {computed} from "vue";
-import {format, startOfWeek, endOfWeek} from "date-fns";
+import {startOfWeek, endOfWeek} from "date-fns";
+import useDateLocalize from "../../../Composables/useDateLocalize";
 
 const props = defineProps({
     selectedDate: {
@@ -14,6 +15,8 @@ const props = defineProps({
     },
 })
 
+const {translatedFormat} = useDateLocalize();
+
 const label = computed(() => {
     const start = startOfWeek(props.selectedDate, {
         weekStartsOn: props.weekStartsOn,
@@ -23,7 +26,7 @@ const label = computed(() => {
         weekStartsOn: props.weekStartsOn,
     });
 
-    return `${format(start, 'MMM do')} - ${format(end, 'MMM do')}`
+    return `${translatedFormat(start, 'MMM do')} - ${translatedFormat(end, 'MMM do')}`
 });
 </script>
 <template>

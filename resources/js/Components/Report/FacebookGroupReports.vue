@@ -1,6 +1,7 @@
 <script setup>
 import Panel from "@/Components/Surface/Panel.vue";
-import ChartBar from "@/Components/Package/ChartBar.vue";
+import {computed} from "vue";
+import ChartTrend from "../Chart/ChartTrend.vue";
 
 const props = defineProps({
     data: {
@@ -20,27 +21,20 @@ const getMetricCount = (value) => {
 const getAudienceData = (value) => {
     return props.data.audience.hasOwnProperty(value) ? props.data.audience[value] : []
 }
+
+const chartData = computed(() => {
+    return {
+        labels: getAudienceData('labels'),
+        aggregates: getAudienceData('values'),
+    }
+})
 </script>
 <template>
     <div class="row-px mt-2xl">
         <Panel>
-            <template #title>Audience</template>
-            <template #description>The number of members per day during the selected period</template>
-            <ChartBar :data="{
-                labels: getAudienceData('labels'),
-                datasets: [
-                    {
-                        label: 'Members',
-                        type: 'line',
-                        data: getAudienceData('values'),
-                        borderColor: '#3F3795',
-                        pointBackgroundColor: '#4F46BB',
-                        pointBorderColor: '#4F46BB',
-                        yAxisID: 'y1',
-                        order: 0,
-                    }
-                ]
-            }"/>
+            <template #title>{{ $t('report.audience') }}</template>
+            <template #description>{{ $t('service.facebook.report.number_members_per_day') }}</template>
+            <ChartTrend :label="$t('report.members')" :labels="chartData.labels" :aggregates="chartData.aggregates"/>
         </Panel>
     </div>
 </template>

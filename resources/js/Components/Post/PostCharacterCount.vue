@@ -53,7 +53,7 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-    <div v-if="currentCharLeft !== null" class="flex justify-center">
+    <div v-if="currentCharLeft !== null" class="flex items-center justify-center">
         <div
             :class="{'text-stone-800': currentCharLeft >= 0, 'text-orange-500': currentCharLeft * 100 / currentCharMaxLimit.limit < 20, 'text-red-500': currentCharLeft < 0}">
             {{ currentCharLeft }}

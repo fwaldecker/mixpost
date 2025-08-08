@@ -2,27 +2,43 @@
 
 namespace Inovector\Mixpost\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Inovector\Mixpost\Concerns\Model\HasUuid;
+use Inovector\Mixpost\Concerns\Model\Post\HasActivities;
+use Inovector\Mixpost\Concerns\Model\Post\HasActivitiesNotificationSubscriptions;
+use Inovector\Mixpost\Concerns\OwnedByWorkspace;
+use Inovector\Mixpost\Concerns\UsesUserModel;
 use Inovector\Mixpost\Enums\PostScheduleStatus;
 use Inovector\Mixpost\Enums\PostStatus;
+use Inovector\Mixpost\Events\Post\PostScheduleProcessing;
+use Inovector\Mixpost\Events\Post\PostSetDraft;
 use Inovector\Mixpost\Support\SocialProviderResponse;
 
 class Post extends Model
 {
     use HasFactory;
     use HasUuid;
+    use OwnedByWorkspace;
+    use SoftDeletes;
+    use UsesUserModel;
+    use HasActivities;
+    use HasActivitiesNotificationSubscriptions;
 
     public $table = 'mixpost_posts';
 
     protected $fillable = [
+        'uuid',
+        'user_id',
         'status',
+        'schedule_status',
         'scheduled_at',
         'published_at'
     ];
@@ -51,8 +67,13 @@ class Post extends Model
     public function accounts(): BelongsToMany
     {
         return $this->belongsToMany(Account::class, 'mixpost_post_accounts', 'post_id', 'account_id')
-            ->withPivot(['errors', 'provider_post_id'])
+            ->withPivot(['provider_post_id', 'data', 'errors'])
             ->orderByPivot('id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(self::getUserClass(), 'user_id');
     }
 
     public function versions(): HasMany
@@ -64,6 +85,11 @@ class Post extends Model
     {
         return $this->belongsToMany(Tag::class, 'mixpost_tag_post', 'post_id', 'tag_id')
             ->orderByPivot('id');
+    }
+
+    public function scopeNeedsApproval(Builder $query): Builder
+    {
+        return $query->where('status', PostStatus::NEEDS_APPROVAL->value);
     }
 
     public function scopeFailed(Builder $query): Builder
@@ -85,6 +111,16 @@ class Post extends Model
     {
         // TODO: check if original content is not empty
         return $this->scheduled_at && !$this->scheduled_at->isPast() && $this->accounts()->exists();
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status->name === PostStatus::DRAFT->name;
+    }
+
+    public function isNeedsApproval(): bool
+    {
+        return $this->status->name === PostStatus::NEEDS_APPROVAL->name;
     }
 
     public function isScheduled(): bool
@@ -112,11 +148,25 @@ class Post extends Model
         return $this->schedule_status->name === PostScheduleStatus::PROCESSING->name;
     }
 
-    public function setDraft(): void
+    public function statusWasChanged(): bool
+    {
+        return $this->wasChanged('status');
+    }
+
+    public function scheduledAtWasChanged(): bool
+    {
+        return $this->wasChanged('scheduled_at');
+    }
+
+    public function setDraft(bool $dispatchEvent = true): void
     {
         $this->status = PostStatus::DRAFT->value;
         $this->schedule_status = PostScheduleStatus::PENDING;
         $this->save();
+
+        if ($dispatchEvent) {
+            PostSetDraft::dispatch($this);
+        }
     }
 
     public function setScheduled(Carbon|\Carbon\Carbon|null $datetime = null, ?PostStatus $status = PostStatus::SCHEDULED): void
@@ -132,10 +182,14 @@ class Post extends Model
         $this->save();
     }
 
-    public function setScheduleProcessing(): void
+    public function setScheduleProcessing(bool $dispatchEvent = true): void
     {
         $this->schedule_status = PostScheduleStatus::PROCESSING;
         $this->save();
+
+        if ($dispatchEvent) {
+            PostScheduleProcessing::dispatch($this);
+        }
     }
 
     public function setPublished(): void
@@ -164,6 +218,7 @@ class Post extends Model
 
     public function insertErrors(Account $account, $errors): void
     {
+        // TODO: Create a column for system error in `mixpost_post_accounts`
         $this->accounts()->updateExistingPivot($account->id, [
             'errors' => json_encode($errors)
         ]);

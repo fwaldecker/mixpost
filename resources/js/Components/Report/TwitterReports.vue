@@ -1,7 +1,10 @@
 <script setup>
+import {computed} from "vue";
+import ls from "../../Services/ls";
 import Panel from "@/Components/Surface/Panel.vue";
-import ChartBar from "@/Components/Package/ChartBar.vue";
 import Alert from "../Util/Alert.vue";
+import useAuth from "../../Composables/useAuth";
+import ChartTrend from "../Chart/ChartTrend.vue";
 
 const props = defineProps({
     data: {
@@ -21,57 +24,70 @@ const getMetricCount = (value) => {
 const getAudienceData = (value) => {
     return props.data.audience.hasOwnProperty(value) ? props.data.audience[value] : []
 }
+
+const isFreeTier = computed(() => {
+    return props.data.tier === 'free';
+});
+
+const {user} = useAuth();
+
+const showAlert = computed(() => {
+    if (!user.value.is_admin) {
+        return false;
+    }
+
+    return !ls.get('twitter_api_tier_alert') && isFreeTier.value;
+});
+
+const closeAlert = () => {
+    ls.set('twitter_api_tier_alert', true);
+}
+
+const chartData = computed(() => {
+    return {
+        labels: getAudienceData('labels'),
+        aggregates: getAudienceData('values'),
+    }
+})
 </script>
 <template>
     <div class="row-px mt-2xl">
-        <div v-if="data.tier === 'free'" class="mb-lg">
-            <Alert variant="warning" :closeable="false">
-                <div>You are using Free Tier Twitter API. Reports may be limited.</div>
-                <a href="https://developer.twitter.com/en/portal/dashboard" target="_blank" class="underline">Upgrade
-                    Twitter API Tier</a>
+        <div v-if="showAlert" class="mb-lg">
+            <Alert variant="warning" @close="closeAlert">
+                <div>
+                    <div>{{ $t('service.twitter.reports_limited') }}</div>
+                    <a href="https://developer.twitter.com/en/portal/dashboard" target="_blank" class="underline">
+                        {{  $t('service.twitter.upgrade') }}</a>
+                </div>
             </Alert>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
+        <div v-if="!isFreeTier" class="grid grid-cols-1 md:grid-cols-3 gap-sm">
             <Panel>
-                <template #title><span v-tooltip="'The number of times where your posts were liked'">Likes</span>
+                <template #title><span v-tooltip="$t('report.posts_liked')">{{ $t('report.likes') }}</span>
                 </template>
-                <div class="font-bold text-indigo-500 text-2xl">{{ getMetricCount('likes') }}</div>
+                <div class="font-bold text-primary-500 text-2xl">{{ getMetricCount('likes') }}</div>
             </Panel>
 
             <Panel>
-                <template #title><span v-tooltip="'The number of times your tweets have been retweeted'">Retweets</span>
+                <template #title><span v-tooltip="$t('service.twitter.number_retweets')">{{$t('service.twitter.retweets')}}</span>
                 </template>
-                <div class="font-bold text-indigo-500 text-2xl">{{ getMetricCount('retweets') }}</div>
+                <div class="font-bold text-primary-500 text-2xl">{{ getMetricCount('retweets') }}</div>
             </Panel>
 
             <Panel>
-                <template #title><span v-tooltip="'The number of times people saw your posts'">Impressions</span>
+                <template #title><span v-tooltip="$t('report.impressions_posts')">{{$t('report.impressions')}}</span>
                 </template>
-                <div class="font-bold text-indigo-500 text-2xl">{{ getMetricCount('impressions') }}</div>
+                <div class="font-bold text-primary-500 text-2xl">{{ getMetricCount('impressions') }}</div>
             </Panel>
         </div>
     </div>
 
     <div class="row-px mt-2xl">
         <Panel>
-            <template #title>Audience</template>
-            <template #description>The number of followers per day during the selected period</template>
-            <ChartBar :data="{
-                labels: getAudienceData('labels'),
-                datasets: [
-                    {
-                        label: 'Followers',
-                        type: 'line',
-                        data: getAudienceData('values'),
-                        borderColor: '#3F3795',
-                        pointBackgroundColor: '#4F46BB',
-                        pointBorderColor: '#4F46BB',
-                        yAxisID: 'y1',
-                        order: 0,
-                    }
-                ]
-            }"/>
+            <template #title>{{ $t('report.audience') }}</template>
+            <template #description>{{ $t('report.followers_per_day') }}</template>
+            <ChartTrend :label="$t('report.followers')" :labels="chartData.labels" :aggregates="chartData.aggregates"/>
         </Panel>
     </div>
 </template>

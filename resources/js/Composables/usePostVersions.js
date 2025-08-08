@@ -1,16 +1,71 @@
 const usePostVersions = () => {
-    const versionContentObject = (body = '', media = []) => {
+    const versionContentObject = (body = '', media = [], video_thumbs = [], url = '', opened = true) => {
         return {
             body,
-            media
+            media,
+            video_thumbs,
+            url,
+            opened
         };
     }
 
-    const versionObject = (accountId = 0, isOriginal = false, body = '') => {
+    const versionOptions = (title, link) => {
+        return {
+            mastodon: {
+                sensitive: false,
+            },
+            facebook_page: {
+                type: 'post' // post, reel...etc.
+            },
+            instagram: {
+                type: 'post' // post, reel...etc.
+            },
+            youtube: {
+                title,
+                status: 'public'
+            },
+            pinterest: {
+                title,
+                link,
+                boards: {
+                    'account-0': null
+                }
+            },
+            linkedin: {
+                visibility: 'PUBLIC'
+            },
+            tiktok: {
+                privacy_level: {
+                    'account-0': ''
+                },
+                allow_comments: {
+                    'account-0': false
+                },
+                allow_duet: {
+                    'account-0': false
+                },
+                allow_stitch: {
+                    'account-0': false
+                },
+                content_disclosure: {
+                    'account-0': false
+                },
+                brand_organic_toggle: {
+                    'account-0': false
+                },
+                brand_content_toggle: {
+                    'account-0': false
+                },
+            },
+        };
+    }
+
+    const versionObject = (accountId = 0, isOriginal = false, contentBody = '', media = [], video_thumbs = [], title = '', link = '') => {
         return {
             account_id: accountId,
             is_original: isOriginal,
-            content: [versionContentObject(body)]
+            content: [versionContentObject(contentBody, media, video_thumbs, link)],
+            options: versionOptions(title, link)
         }
     }
 
@@ -34,6 +89,12 @@ const usePostVersions = () => {
         return versions.findIndex(version => version.account_id === accountId);
     }
 
+    const getAccountsWithoutVersion = (versions, selectedAccounts) => {
+        return selectedAccounts.filter(
+            (account) => !accountHasVersion(versions, account.id)
+        )
+    }
+
     const accountHasVersion = (versions, accountId) => {
         return versions.some(version => version.account_id === accountId);
     }
@@ -44,6 +105,7 @@ const usePostVersions = () => {
         getOriginalVersion,
         getAccountVersion,
         getIndexAccountVersion,
+        getAccountsWithoutVersion,
         accountHasVersion
     }
 }

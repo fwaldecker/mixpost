@@ -1,11 +1,14 @@
 <script setup>
+import { useI18n } from "vue-i18n";
 import {useForm} from "@inertiajs/vue3";
 import useNotifications from "@/Composables/useNotifications";
 import PrimaryButton from "@/Components/Button/PrimaryButton.vue";
 import HorizontalGroup from "@/Components/Layout/HorizontalGroup.vue";
-import Input from "../Form/Input.vue";
 import Error from "../Form/Error.vue";
 import Label from "../Form/Label.vue";
+import InputHidden from "../Form/InputHidden.vue";
+
+const { t: $t } = useI18n()
 
 const {notify} = useNotifications();
 
@@ -19,7 +22,7 @@ const save = () => {
         preserveScroll: true,
         onSuccess() {
             form.reset();
-            notify('success', 'Password have been changed');
+            notify('success',  $t('profile.password_changed') );
         }
     });
 }
@@ -30,30 +33,28 @@ const save = () => {
 
         <HorizontalGroup class="mt-lg">
             <template #title>
-                <label for="current_password">Current password</label>
+                <label for="current_password">{{ $t('profile.current_password') }}</label>
             </template>
 
-            <Input type="password" v-model="form.current_password" :error="form.errors.current_password" id="current_password"/>
+            <InputHidden v-model="form.current_password" :error="form.errors.current_password" id="current_password" required/>
         </HorizontalGroup>
 
         <HorizontalGroup class="mt-md">
             <template #title>
-                <label for="password">New password</label>
+                <label for="password">{{ $t('profile.new_password') }}</label>
             </template>
 
-            <Input v-model="form.password" :error="form.errors.password" type="password" id="password" class="w-full"
-                   autocomplete="new-password"/>
+            <InputHidden v-model="form.password" :error="form.errors.password" id="password" autocomplete="new-password" required/>
         </HorizontalGroup>
 
         <HorizontalGroup class="mt-md">
             <template #title>
-                <label for="password_confirmation">Confirm new password</label>
+                <label for="password_confirmation">{{ $t('profile.confirm_new_password') }}</label>
             </template>
 
-            <Input v-model="form.password_confirmation" :error="form.errors.password_confirmation" type="password" id="password_confirmation"
-                   class="w-full" required autocomplete="new-password"/>
+            <InputHidden v-model="form.password_confirmation" :error="form.password_confirmationpassword" id="password_confirmation" autocomplete="new-password" required/>
         </HorizontalGroup>
 
-        <PrimaryButton type="submit" class="mt-lg">Save</PrimaryButton>
+        <PrimaryButton type="submit" class="mt-lg">{{ $t('general.save') }}</PrimaryButton>
     </form>
 </template>

@@ -30,7 +30,7 @@ class Service extends Model
 
     public $timestamps = false;
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::saved(function ($service) {
             ServiceManager::put(

@@ -21,6 +21,10 @@ const props = defineProps({
     variant: {
         type: String,
         default: 'warning'
+    },
+    zIndexClass: {
+        type: String,
+        default: 'z-30'
     }
 });
 
@@ -48,6 +52,7 @@ const close = () => {
         :show="show"
         :max-width="maxWidth"
         :closeable="closeable"
+        :z-index-class="zIndexClass"
         @close="close"
     >
         <template #body>
@@ -56,7 +61,7 @@ const close = () => {
                    <ExclamationIcon :class="exclamationIconClasses"/>
                 </div>
 
-                <div class="flex flex-col text-center sm:mt-0 sm:ml-md mt-md sm:mt-0 sm:text-left">
+                <div class="flex flex-col text-center sm:ml-md mt-md sm:mt-0 sm:text-left">
                     <div class="text-lg"><slot name="header"/></div>
                     <div class="mt-xs"><slot name="body"/></div>
                 </div>

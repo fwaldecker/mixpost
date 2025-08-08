@@ -1,6 +1,8 @@
 <script setup>
 import {computed} from "vue";
-import {format} from "date-fns";
+import useDateLocalize from "../../../Composables/useDateLocalize";
+
+const {translatedFormat} = useDateLocalize();
 
 const props = defineProps({
     selectedDate: {
@@ -9,8 +11,8 @@ const props = defineProps({
     }
 })
 
-const label = computed(()=> {
-    return format(props.selectedDate, 'MMMM yyyy');
+const label = computed(() => {
+    return translatedFormat(props.selectedDate, 'MMMM yyyy');
 });
 </script>
 <template>

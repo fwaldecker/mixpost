@@ -13,6 +13,7 @@ trait ManagesOAuth
             'redirect_uri' => $this->redirectUrl,
             'scope' => 'read write',
             'response_type' => 'code',
+            'state' => $this->values['state']
         ];
 
         return $this->buildUrlFromBase("$this->serverUrl/oauth/authorize", $params);

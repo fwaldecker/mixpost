@@ -1,11 +1,14 @@
 <script setup>
-import {computed} from "vue";
+import {computed, inject} from "vue";
 import {router} from "@inertiajs/vue3";
 import {format} from "date-fns";
 import {utcToZonedTime} from "date-fns-tz";
 import CalendarPostItem from "@/Components/Calendar/CalendarPostItem.vue";
+import useWorkspace from "../../../Composables/useWorkspace.js";
 import PlusIcon from "@/Icons/Plus.vue"
 import DisabledItemImg from "@img/calendar-disabled-item.svg"
+
+const workspaceCtx = inject('workspaceCtx');
 
 const props = defineProps({
     day: {
@@ -23,6 +26,8 @@ const props = defineProps({
     },
 })
 
+const {isWorkspaceEditorRole} = useWorkspace();
+
 const label = computed(() => {
     return format(new Date(`${props.day.date}T00:00:00`), 'd');
 })
@@ -38,11 +43,13 @@ const style = computed(() => {
 })
 
 const add = () => {
+    if (!isWorkspaceEditorRole.value) return;
+
     const now = utcToZonedTime(new Date().toISOString(), props.timeZone);
 
     let scheduleAt = `${props.day.date} ${format(now, 'HH:mm')}`;
 
-    router.visit(route('mixpost.posts.create', {schedule_at: scheduleAt}));
+    router.visit(route('mixpost.posts.create', {workspace: workspaceCtx.id, schedule_at: scheduleAt}));
 }
 </script>
 <template>
@@ -51,15 +58,16 @@ const add = () => {
         :style="style"
     >
         <div class="absolute w-full top-0 left-0 mt-xs text-center">
-            <span class="w-7 h-7 inline-flex items-center justify-center p-1 mr-xs rounded-full text-gray-700"
-                  :class="{'bg-indigo-500 text-white': isToday,'text-gray-400': day.isDisabled}">{{ label }}</span>
+            <span
+                class="w-7 h-7 inline-flex items-center justify-center p-1 mr-xs rtl:mr-0 rtl:ml-xs rounded-full text-gray-700"
+                :class="{'bg-primary-500 text-white': isToday,'text-gray-400': day.isDisabled}">{{ label }}</span>
         </div>
 
         <div
-            v-if="!day.isDisabled"
-            class="absolute mt-xs right-0 mr-sm opacity-0 group-hover:opacity-100 transition-opacity ease-in-out duration-300">
+            v-if="!day.isDisabled && isWorkspaceEditorRole"
+            class="absolute mt-xs right-0 mr-sm rtl:mr-0 rtl:ml-sm opacity-0 group-hover:opacity-100 transition-opacity ease-in-out duration-300">
             <button @click="add" type="button"
-                    class="text-gray-400 hover:text-indigo-500 transition-colors ease-in-out duration-200">
+                    class="text-gray-400 hover:text-primary-500 transition-colors ease-in-out duration-200">
                 <PlusIcon/>
             </button>
         </div>

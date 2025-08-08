@@ -5,8 +5,9 @@ namespace Inovector\Mixpost\SocialProviders\Twitter;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Illuminate\Http\Request;
 use Inovector\Mixpost\Abstracts\SocialProvider;
-use Inovector\Mixpost\Http\Resources\AccountResource;
+use Inovector\Mixpost\Contracts\AccountResource;
 use Inovector\Mixpost\Services\TwitterService;
+use Inovector\Mixpost\SocialProviders\Twitter\Concerns\ManagesConfig;
 use Inovector\Mixpost\SocialProviders\Twitter\Concerns\ManagesOAuth;
 use Inovector\Mixpost\SocialProviders\Twitter\Concerns\ManagesRateLimit;
 use Inovector\Mixpost\SocialProviders\Twitter\Concerns\ManagesResources;
@@ -15,6 +16,7 @@ use Inovector\Mixpost\Util;
 
 class TwitterProvider extends SocialProvider
 {
+    use ManagesConfig;
     use ManagesRateLimit;
     use ManagesOAuth;
     use ManagesResources;
@@ -45,11 +47,6 @@ class TwitterProvider extends SocialProvider
         return TwitterService::class;
     }
 
-    public function getTier(): string
-    {
-        return self::service()::getConfiguration('tier');
-    }
-
     public static function postConfigs(): SocialProviderPostConfigs
     {
         return SocialProviderPostConfigs::make()
@@ -68,5 +65,19 @@ class TwitterProvider extends SocialProvider
     public static function externalPostUrl(AccountResource $accountResource): string
     {
         return "https://twitter.com/$accountResource->username/status/{$accountResource->pivot->provider_post_id}";
+    }
+
+    public static function externalAccountUrl(AccountResource $accountResource): string
+    {
+        return "https://x.com/$accountResource->username";
+    }
+
+    public static function mapErrorMessage(string $key): string
+    {
+        return match ($key) {
+            'access_token_expired' => __('mixpost::account.access_token_expired'),
+            'upload_failed' => __('mixpost::service.twitter.upload_failed'),
+            default => $key,
+        };
     }
 }

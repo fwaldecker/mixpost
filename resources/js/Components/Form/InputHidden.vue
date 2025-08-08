@@ -36,6 +36,10 @@ const props = defineProps({
         type: String,
         default: 'Hide',
     },
+    disabled: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 defineEmits(['update:modelValue']);
@@ -61,6 +65,7 @@ const toggleType = () => {
                :autocomplete="autocomplete"
                :placeholder="placeholder"
                :error="error"
+               :disabled="disabled"
                :id="id"
                :required="required"
                class="pr-2xl"

@@ -29,7 +29,7 @@ const sizeClass = computed(() => {
 });
 
 const classes = computed(() => {
-    return `flex items-center text-left w-full first:rounded-t-md last:rounded-b-md text-gray-800 transition ease-in-out duration-200 ${props.isActive ? 'bg-indigo-50' : 'hover:bg-gray-100'}`;
+    return `flex items-center text-left w-full first:rounded-t-md last:rounded-b-md text-gray-800 transition ease-in-out duration-200 ${props.isActive ? 'bg-primary-50' : 'hover:bg-gray-100'}`;
 });
 
 const iconClass = 'mr-xs rtl:mr-0 rtl:ml-xs';

@@ -2,16 +2,25 @@
 
 namespace Inovector\Mixpost\SocialProviders\Twitter\Concerns;
 
+use Abraham\TwitterOAuth\TwitterOAuthException;
+use Illuminate\Validation\ValidationException;
+
 trait ManagesOAuth
 {
     public function getAuthUrl(): string
     {
-        $result = $this->connection->oauth('oauth/request_token', [
-            'x_auth_access_type' => 'write',
-            'oauth_callback' => $this->redirectUrl
-        ]);
+        try {
+            $result = $this->connection->oauth('oauth/request_token', [
+                'x_auth_access_type' => 'write',
+                'oauth_callback' => "$this->redirectUrl?state={$this->values['state']}"
+            ]);
 
-        return $this->connection->url('oauth/authorize', ['oauth_token' => $result['oauth_token']]);
+            return $this->connection->url('oauth/authorize', ['oauth_token' => $result['oauth_token']]);
+        } catch (TwitterOAuthException $e) {
+            throw ValidationException::withMessages([
+                'service_auth' => [__('mixpost::error.service_auth_failed', ['service' => 'X'])],
+            ]);
+        }
     }
 
     public function requestAccessToken(array $params): array

@@ -21,7 +21,11 @@ defineProps({
     scrollableBody: {
         type: Boolean,
         default: false,
-    }
+    },
+    zIndexClass: {
+        type: String,
+        default: 'z-10'
+    },
 });
 
 const close = () => {
@@ -35,6 +39,7 @@ const close = () => {
         :max-width="maxWidth"
         :closeable="closeable"
         :dialog-class="scrollableBody ? 'overflow-hidden' : ''"
+        :z-index-class="zIndexClass"
         @close="close"
     >
         <div class="w-full h-full min-h-full max-h-max relative overflow-x-hidden overflow-y-auto">

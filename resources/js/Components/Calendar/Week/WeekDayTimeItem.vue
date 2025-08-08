@@ -1,5 +1,5 @@
 <script setup>
-import {computed} from "vue";
+import {computed, inject} from "vue";
 import {router} from "@inertiajs/vue3";
 import {isDateTimePast} from "@/helpers";
 import {addMinutes, format, getHours, parseISO} from "date-fns";
@@ -7,6 +7,10 @@ import {utcToZonedTime} from "date-fns-tz";
 import CalendarPostItem from "@/Components/Calendar/CalendarPostItem.vue";
 import PlusIcon from "@/Icons/Plus.vue"
 import DisabledItemImg from "@img/calendar-disabled-item.svg"
+import useDateLocalize from "../../../Composables/useDateLocalize";
+import useWorkspace from "../../../Composables/useWorkspace.js";
+
+const workspaceCtx = inject('workspaceCtx');
 
 const props = defineProps({
     dateSlot: {
@@ -37,6 +41,9 @@ const props = defineProps({
     },
 })
 
+const {translatedFormat} = useDateLocalize();
+const {isWorkspaceEditorRole} = useWorkspace();
+
 const isDisabled = computed(() => {
     const cellDateTimeMinute = addMinutes(parseISO(`${props.dateSlot} ${props.timeSlot}`), props.minuteSlot['end']);
 
@@ -46,7 +53,7 @@ const isDisabled = computed(() => {
 const label = computed(() => {
     const cellDateTimeMinute = addMinutes(parseISO(`${props.dateSlot} ${props.timeSlot}`), props.minuteSlot['start']);
 
-    return format(cellDateTimeMinute, `${props.timeFormat === 12 ? 'h:mm aaa' : 'H:mm'}`)
+    return translatedFormat(cellDateTimeMinute, `${props.timeFormat === 12 ? 'h:mm aaa' : 'H:mm'}`);
 })
 
 const style = computed(() => {
@@ -60,6 +67,8 @@ const style = computed(() => {
 })
 
 const add = () => {
+    if (!isWorkspaceEditorRole.value) return;
+
     let scheduleAt = `${props.dateSlot} ${props.timeSlot}`;
 
     const now = utcToZonedTime(new Date().toISOString(), props.timeZone);
@@ -70,7 +79,7 @@ const add = () => {
         scheduleAt = format(now, 'yyyy-MM-dd H:mm');
     }
 
-    router.visit(route('mixpost.posts.create', {schedule_at: scheduleAt}));
+    router.visit(route('mixpost.posts.create', {workspace: workspaceCtx.id, schedule_at: scheduleAt}));
 }
 </script>
 <template>
@@ -79,10 +88,10 @@ const add = () => {
         :style="style"
     >
         <div
-            v-if="!isDisabled"
+            v-if="!isDisabled && isWorkspaceEditorRole"
             class="absolute mt-xs right-0 mr-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity ease-in-out duration-300">
             <button @click="add" type="button"
-                    class="flex items-center text-gray-400 hover:text-indigo-500 transition-colors ease-in-out duration-200">
+                    class="flex items-center text-gray-400 hover:text-primary-500 transition-colors ease-in-out duration-200">
                 <span class="mr-xs text-sm">{{ label }}</span>
                 <PlusIcon/>
             </button>

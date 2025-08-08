@@ -2,7 +2,7 @@
 
 namespace Inovector\Mixpost\Contracts;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 interface Query

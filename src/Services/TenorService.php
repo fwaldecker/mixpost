@@ -29,7 +29,7 @@ class TenorService extends Service
     public static function formMessages(): array
     {
         return [
-            'client_id' => 'The API Key is required.'
+            'client_id' => __('validation.required', ['attribute' => 'API Key']),
         ];
     }
 }

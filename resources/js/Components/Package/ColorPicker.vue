@@ -48,7 +48,7 @@ onUnmounted(() => {
 </script>
 <template>
     <div class="flex items-center justify-between">
-        <div>
+        <div class="pr-md rtl:pr-0 rtl:pl-md">
             <div class="grid grid-cols-4 gap-sm">
                 <template v-for="(colorHex, index) in colors" :key="index">
                     <button @click="onChange(colorHex)" role="button" type="button"
@@ -59,7 +59,7 @@ onUnmounted(() => {
                 </template>
             </div>
             <Input type="text" :value="modelValue" @update:modelValue="onChange"
-                   class="mt-4 w-32"/>
+                   class="mt-md"/>
         </div>
 
         <div ref="el"/>

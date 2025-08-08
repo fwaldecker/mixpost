@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted} from "vue";
+import {inject, onMounted} from "vue";
 import useMedia from "@/Composables/useMedia";
 import useNotifications from "@/Composables/useNotifications";
 import UploadMedia from "@/Components/Media/UploadMedia.vue"
@@ -8,10 +8,20 @@ import MediaFile from "@/Components/Media/MediaFile.vue";
 import Masonry from "@/Components/Layout/Masonry.vue";
 import SectionTitle from "@/Components/DataDisplay/SectionTitle.vue";
 
+const workspaceCtx = inject('workspaceCtx');
+
 const props = defineProps({
     columns: {
         type: Number,
         default: 3
+    },
+    maxSelectedItems: {
+        type: Number,
+        default: -1 //infinite
+    },
+    mimeTypes: {
+        type: Array,
+        default: []
     }
 })
 
@@ -27,7 +37,7 @@ const {
     removeItems,
     isSelected,
     createObserver
-} = useMedia();
+} = useMedia('mixpost.media.fetchUploads', {workspace: workspaceCtx.id}, props.maxSelectedItems, props.mimeTypes);
 
 onMounted(() => {
     createObserver();
@@ -42,11 +52,12 @@ defineExpose({selected, deselectAll, removeItems})
                  :toggleSelect="toggleSelect"
                  :isSelected="isSelected"
                  :columns="columns"
+                 :mimeTypes="props.mimeTypes"
     />
 
     <div :class="{'mt-lg': items.length}">
         <template v-if="items.length">
-            <SectionTitle class="mb-4">Library</SectionTitle>
+            <SectionTitle class="mb-4">{{ $t('media.library') }}</SectionTitle>
 
             <Masonry :items="items" :columns="columns">
                 <template #default="{item}">

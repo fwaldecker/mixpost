@@ -15,15 +15,15 @@ class HorizonStatus
     public function get(): string
     {
         if (!$masters = $this->masterSupervisorRepository->all()) {
-            return 'Inactive';
+            return 'inactive';
         }
 
         if (collect($masters)->contains(function ($master) {
             return $master->status === 'paused';
         })) {
-            return 'Paused';
+            return 'paused';
         }
 
-        return 'Active';
+        return 'active';
     }
 }

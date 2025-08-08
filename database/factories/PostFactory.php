@@ -7,6 +7,8 @@ use Illuminate\Support\Arr;
 use Inovector\Mixpost\Enums\PostScheduleStatus;
 use Inovector\Mixpost\Enums\PostStatus;
 use Inovector\Mixpost\Models\Post;
+use Inovector\Mixpost\Models\User;
+use Inovector\Mixpost\Models\Workspace;
 
 class PostFactory extends Factory
 {
@@ -22,6 +24,8 @@ class PostFactory extends Factory
 
         return [
             'uuid' => $this->faker->uuid,
+            'workspace_id' => Workspace::factory(),
+            'user_id' => User::factory(),
             'status' => $status->value,
             'schedule_status' => $status === PostStatus::PUBLISHED ? PostScheduleStatus::PROCESSED : PostScheduleStatus::PENDING,
             'scheduled_at' => $status !== PostStatus::DRAFT ? $scheduled : null,

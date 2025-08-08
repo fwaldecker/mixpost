@@ -4,9 +4,11 @@ namespace Inovector\Mixpost\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Inovector\Mixpost\Concerns\OwnedByWorkspace;
 
 class Audience extends Model
 {
+    use OwnedByWorkspace;
     use HasFactory;
 
     public $table = 'mixpost_audience';

@@ -2,15 +2,17 @@
 
 namespace Inovector\Mixpost\SocialProviders\Meta\Concerns;
 
-use Inovector\Mixpost\Facades\ServiceManager;
-use Inovector\Mixpost\Services\FacebookService;
+use Inovector\Mixpost\Enums\SocialProviderContentType;
 
 trait ManagesConfig
 {
+    public static function contentType(): SocialProviderContentType
+    {
+        return SocialProviderContentType::COMMENTS;
+    }
+
     public static function getApiVersionConfig(): string
     {
-        $versions = FacebookService::versions();
-
-        return ServiceManager::get('facebook', 'api_version') ?? current($versions);
+        return self::service()::getConfiguration('api_version');
     }
 }

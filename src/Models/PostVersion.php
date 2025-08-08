@@ -3,10 +3,13 @@
 namespace Inovector\Mixpost\Models;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PostVersion extends Model
 {
+    use HasFactory;
+
     public $table = 'mixpost_post_versions';
 
     public $timestamps = false;
@@ -14,13 +17,20 @@ class PostVersion extends Model
     protected $fillable = [
         'account_id',
         'is_original',
-        'content'
+        'content',
+        'options'
     ];
 
     protected $casts = [
         'is_original' => 'boolean',
         'content' => 'array',
+        'options' => 'array'
     ];
+
+    public function scopeOriginal(Builder $query): Builder
+    {
+        return $query->where('is_original', true);
+    }
 
     public function scopeHasMedia(Builder $query, Media $media): Builder
     {
@@ -40,5 +50,4 @@ class PostVersion extends Model
         $this->content = $content;
         $this->save();
     }
-
 }

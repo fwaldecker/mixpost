@@ -8,12 +8,13 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Inovector\Mixpost\Actions\AccountPublishPost;
+use Inovector\Mixpost\Actions\Post\AccountPublishPost;
 use Inovector\Mixpost\Concerns\Job\HasSocialProviderJobRateLimit;
+use Inovector\Mixpost\Contracts\QueueWorkspaceAware;
 use Inovector\Mixpost\Models\Account;
 use Inovector\Mixpost\Models\Post;
 
-class AccountPublishPostJob implements ShouldQueue
+class AccountPublishPostJob implements ShouldQueue, QueueWorkspaceAware
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -40,13 +41,20 @@ class AccountPublishPostJob implements ShouldQueue
             return;
         }
 
+        if ($this->post->trashed()) {
+            $this->post->setDraft();
+            $this->batch()->cancel();
+
+            return;
+        }
+
         if (!$this->account->isServiceActive()) {
-            $this->post->insertErrors($this->account, ['Service disabled']);
+            $this->post->insertErrors($this->account, ['service_disabled']);
             return;
         }
 
         if ($this->account->isUnauthorized()) {
-            $this->post->insertErrors($this->account, ['Access token expired']);
+            $this->post->insertErrors($this->account, ['access_token_expired']);
 
             return;
         }

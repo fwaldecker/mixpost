@@ -2,11 +2,12 @@
 
 namespace Inovector\Mixpost\Contracts;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Inovector\Mixpost\Http\Resources\AccountResource;
+use Inovector\Mixpost\Http\Base\Resources\AccountResource;
+use Inovector\Mixpost\Support\SocialProviderPostConfigs;
 use Inovector\Mixpost\Support\SocialProviderResponse;
-use Closure;
 
 interface SocialProvider
 {
@@ -30,7 +31,15 @@ interface SocialProvider
 
     public function publishPost(string $text, Collection $media, array $params = []): SocialProviderResponse;
 
+    public function publishComment(string $text, string $postId, array $params = []): SocialProviderResponse;
+
     public function deletePost($id): SocialProviderResponse;
 
+    public static function postConfigs(): SocialProviderPostConfigs;
+
+    public static function postOptions(): SocialProviderPostOptions;
+
     public static function externalPostUrl(AccountResource $accountResource): string;
+
+    public static function mapErrorMessage(string $key): string;
 }

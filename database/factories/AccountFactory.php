@@ -5,6 +5,7 @@ namespace Inovector\Mixpost\Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Inovector\Mixpost\Models\Account;
+use Inovector\Mixpost\Models\Workspace;
 
 class AccountFactory extends Factory
 {
@@ -18,6 +19,7 @@ class AccountFactory extends Factory
 
         return [
             'uuid' => $this->faker->uuid,
+            'workspace_id' => Workspace::factory(),
             'name' => $name,
             'username' => Str::camel($this->faker->name),
             'provider' => $providers[rand(0, 2)],

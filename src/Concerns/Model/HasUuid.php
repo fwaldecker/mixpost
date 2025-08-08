@@ -31,6 +31,6 @@ trait HasUuid
 
     public static function firstOrFailTrashedByUuid($uuid): static
     {
-        return static::where('uuid', $uuid)->firstOrFail();
+        return static::where('uuid', $uuid)->withTrashed()->firstOrFail();
     }
 }

@@ -9,8 +9,8 @@ defineEmits(["insert"]);
     <AddMedia @insert="$emit('insert', $event)">
         <button
             type="button"
-            v-tooltip="`Media`"
-            class="text-stone-800 hover:text-indigo-500 transition-colors ease-in-out duration-200"
+            v-tooltip="$t('post.media')"
+            class="text-stone-800 hover:text-primary-500 transition-colors ease-in-out duration-200"
         >
             <PhotoIcon/>
         </button>

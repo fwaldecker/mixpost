@@ -4,10 +4,12 @@ namespace Inovector\Mixpost\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Inovector\Mixpost\Concerns\OwnedByWorkspace;
 
 class ImportedPost extends Model
 {
     use HasFactory;
+    use OwnedByWorkspace;
 
     public $table = 'mixpost_imported_posts';
 
@@ -22,7 +24,7 @@ class ImportedPost extends Model
     protected $casts = [
         'content' => 'array',
         'metrics' => 'array',
-        'created_at' => 'date' // TODO: change type of this column from `date` to `datetime`
+        'created_at' => 'datetime'
     ];
 
     public $timestamps = false;

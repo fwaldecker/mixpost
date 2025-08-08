@@ -2,13 +2,17 @@
 
 namespace Inovector\Mixpost\Support;
 
+use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Http\Client\Response;
 use Illuminate\Http\File as HttpFile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class File
 {
-    public static function fromBase64(string $base64File): UploadedFile
+    public static function fromBase64(string $base64File, ?string $filename = null): UploadedFile
     {
         // Get file data base64 string
         $fileData = base64_decode(Arr::last(explode(',', $base64File)));
@@ -24,7 +28,7 @@ class File
 
         $file = new UploadedFile(
             $tempFileObject->getPathname(),
-            $tempFileObject->getFilename(),
+            $filename ?: $tempFileObject->getFilename(),
             $tempFileObject->getMimeType(),
             0,
             true // Mark it as test, since the file isn't from real HTTP POST.
@@ -38,5 +42,33 @@ class File
 
         // return UploadedFile object
         return $file;
+    }
+
+    public static function fetchUrl(string $url, int $timeout = 10): PromiseInterface|Response
+    {
+        return Http::timeout($timeout)->get($url);
+    }
+
+    public static function getFilenameFromHttpResponse(Response $response, ?string $fallbackFilename = null): string
+    {
+        $contentDisposition = $response->header('Content-Disposition');
+
+        if ($contentDisposition) {
+            // Extract filename using regex
+            if (preg_match('/filename="([^"]+)"/', $contentDisposition, $matches)) {
+                return $matches[1];
+            } elseif (preg_match('/filename\*=UTF-8\'\'([^;]+)/', $contentDisposition, $matches)) {
+                return rawurldecode($matches[1]);
+            }
+        }
+
+        // Try to get the file name from the URL
+        $urlPath = parse_url($response->effectiveUri(), PHP_URL_PATH);
+
+        if ($urlPath) {
+            return basename($urlPath);
+        }
+
+        return $fallbackFilename ?: Str::random(40);
     }
 }

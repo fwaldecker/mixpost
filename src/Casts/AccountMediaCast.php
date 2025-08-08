@@ -8,6 +8,10 @@ class AccountMediaCast implements CastsAttributes
 {
     public function get($model, string $key, $value, array $attributes)
     {
+        if (!$value) {
+            return [];
+        }
+
         return json_decode($value, true);
     }
 

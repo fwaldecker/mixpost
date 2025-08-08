@@ -1,17 +1,20 @@
 <script setup>
 import {ref} from "vue";
+import {useI18n} from "vue-i18n";
 import {router} from "@inertiajs/vue3";
 import useNotifications from "@/Composables/useNotifications";
 import Panel from "@/Components/Surface/Panel.vue";
 import Input from "@/Components/Form/Input.vue";
 import UnsplashIcon from "@/Icons/Unsplash.vue";
 import PrimaryButton from "@/Components/Button/PrimaryButton.vue";
-import HorizontalGroup from "@/Components/Layout/HorizontalGroup.vue";
 import Error from "@/Components/Form/Error.vue";
-import LabelSuffix from "../Form/LabelSuffix.vue";
-import Flex from "../Layout/Flex.vue";
 import Checkbox from "../Form/Checkbox.vue";
+import Flex from "../Layout/Flex.vue";
 import Label from "../Form/Label.vue";
+import LabelSuffix from "../Form/LabelSuffix.vue";
+import HorizontalGroup from "../Layout/HorizontalGroup.vue";
+
+const {t: $t} = useI18n()
 
 const props = defineProps({
     form: {
@@ -29,7 +32,7 @@ const save = () => {
     router.put(route('mixpost.services.update', {service: 'unsplash'}), props.form, {
         preserveScroll: true,
         onSuccess() {
-            notify('success', 'Unsplash service have been saved');
+            notify('success', $t('service.service_saved', {service: 'Unsplash'}));
         },
         onError: (err) => {
             errors.value = err;
@@ -47,10 +50,10 @@ const save = () => {
         </template>
 
         <template #description>
-            <p>With Unsplash you can use external stock photos directly in Mixpost.</p>
+            <p>{{ $t('service.unsplash.can_use_external_photos') }}</p>
             <p>
                 <a href="https://unsplash.com/oauth/applications" class="link" target="_blank">
-                    Create an App on Unsplash</a>.
+                    {{ $t('service.create_app', {name: 'Unsplash'}) }}</a>.
             </p>
         </template>
 
@@ -72,12 +75,12 @@ const save = () => {
 
         <HorizontalGroup class="mt-lg">
             <template #title>
-                Status
+                {{ $t('general.status') }}
             </template>
 
             <Flex :responsive="false" class="items-center">
                 <Checkbox v-model:checked="form.active" id="active"/>
-                <Label for="active" class="mb-0!">Active</Label>
+                <Label for="active" class="mb-0!">{{ $t('general.active') }}</Label>
             </Flex>
 
             <template #footer>
@@ -85,6 +88,6 @@ const save = () => {
             </template>
         </HorizontalGroup>
 
-        <PrimaryButton @click="save" class="mt-lg">Save</PrimaryButton>
+        <PrimaryButton @click="save" class="mt-lg">{{ $t('general.save') }}</PrimaryButton>
     </Panel>
 </template>

@@ -2,7 +2,7 @@
 
 namespace Inovector\Mixpost\SocialProviders\Mastodon\Concerns;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Closure;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;

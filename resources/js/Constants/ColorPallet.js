@@ -25,6 +25,9 @@ export const COLOR_PALLET = {
     'rose-400': '#fb7185',
 }
 
+export const colorDark = '#0f172a';
+export const colorLight = '#f8fafc';
+
 export const COLOR_PALLET_LIST = () => {
     let array = [];
 

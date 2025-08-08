@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed, inject, ref} from "vue";
 import {usePage} from '@inertiajs/vue3';
 import {router} from "@inertiajs/vue3";
 import {difference, first, random} from "lodash";
@@ -12,6 +12,10 @@ import DialogModal from "@/Components/Modal/DialogModal.vue"
 import SecondaryButton from "@/Components/Button/SecondaryButton.vue"
 import Input from "@/Components/Form/Input.vue";
 import Preloader from "@/Components/Util/Preloader.vue";
+import ListGroup from "../DataDisplay/ListGroup.vue";
+import ListItem from "../DataDisplay/ListItem.vue";
+
+const workspaceCtx = inject('workspaceCtx');
 
 const props = defineProps({
     items: {
@@ -87,7 +91,7 @@ const store = () => {
         return nonUsedColors[random(0, nonUsedColors.length - 1)]
     }
 
-    router.post(route('mixpost.tags.store'), {
+    router.post(route('mixpost.tags.store', {workspace: workspaceCtx.id}), {
         name: searchText.value,
         hex_color: pickRandomColor()
     }, {
@@ -106,16 +110,18 @@ const store = () => {
 </script>
 <template>
     <div>
-        <div class="flex items-center">
-            <div class="hidden lg:flex items-center space-x-xs mr-xs">
+        <div class="flex items-center rtl:ml-xs">
+            <div class="hidden lg:flex items-center space-x-xs rtl:space-x-reverse mr-xs rtl:mr-0 rtl:ml-xs">
                 <template v-for="item in items" :key="item.id">
                     <Tag :item="item" :removable="editAllowed" @remove="remove(item)"/>
                 </template>
             </div>
 
-            <SecondaryButton v-if="editAllowed" @click="openManager" size="md">
-                <TagIcon class="lg:mr-xs"/>
-                <span class="hidden lg:block">Labels</span>
+            <SecondaryButton v-if="editAllowed" @click="openManager" :hiddenTextOnSmallScreen="true" size="md">
+                <template #icon>
+                    <TagIcon/>
+                </template>
+                {{ $t("post.labels") }}
             </SecondaryButton>
         </div>
 
@@ -125,7 +131,7 @@ const store = () => {
                      :scrollable-body="true"
                      @close="closeManager">
             <template #header>
-                Labels
+                {{ $t("post.labels") }}
             </template>
 
             <template #body>
@@ -143,29 +149,30 @@ const store = () => {
                                @keyup.enter="store"
                                type="text"
                                autofocus
-                               placeholder="Search or Create New"
+                               :placeholder="$t('tag.search_create_post')"
                                class="w-full"/>
                     </div>
 
-                    <div v-if="availableTags.length" class="mt-xs border border-gray-300 rounded-md">
+                    <ListGroup v-if="availableTags.length" class="mt-xs">
                         <template v-for="item in availableTags">
-                            <div @click="select(item, $event)"
-                                 tabindex="0"
-                                 role="button"
-                                 class="flex items-center justify-between p-2 rounded-t-md last:rounded-t-none last:rounded-b-md border-b last:border-none hover:bg-gray-100 transition-colors ease-in-out duration-200">
-                                <Tag :item="item" :removable="false"/>
-                            </div>
+                            <ListItem @click="select(item, $event)"
+                                      tabindex="0"
+                                      role="button">
+                                <div class="flex">
+                                    <Tag :item="item" :removable="false"/>
+                                </div>
+                            </ListItem>
                         </template>
-                    </div>
+                    </ListGroup>
 
                     <div v-if="searchText" class="mt-4 text-stone-800 italic">
-                        Press Enter to create a new label
+                        {{ $t("tag.create_new_label") }}
                     </div>
                 </div>
             </template>
 
             <template #footer>
-                <SecondaryButton @click="closeManager" class="mr-xs">Done</SecondaryButton>
+                <SecondaryButton @click="closeManager" class="mr-xs"> {{ $t("general.done") }}</SecondaryButton>
             </template>
         </DialogModal>
     </div>

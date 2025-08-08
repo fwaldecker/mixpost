@@ -1,6 +1,7 @@
 import {computed} from "vue";
 import CountTextCharacters from "../Util/CountTextCharacters";
 import Mastodon from "../SocialProviders/Mastodon";
+import Bluesky from "../SocialProviders/Bluesky";
 import Twitter from "twitter-text";
 import {minBy, maxBy} from "lodash";
 import useEditor from "@/Composables/useEditor";
@@ -22,16 +23,18 @@ export default function usePostCharacterLimit(props) {
     const getCharLimit = (version, boundary, comparator) => {
         if (!props.selectedAccounts.length) return null;
 
+        const versionObj = props.versions.find(versionItem => versionItem.account_id === version);
         const accounts = version === 0 ? accountsWithoutVersion.value : props.selectedAccounts.filter(account => account.id === version);
 
         const accountsLimit = accounts.map(account => {
+            const type = versionObj?.options[account.provider]?.type || 'default';
             return {
                 account_id: account.id,
                 provider: {
                     id: account.provider,
                     name: account.provider_name,
                 },
-                limit: getCharLimitForType(boundary, 'default', account),
+                limit: getCharLimitForType(boundary, type, account),
             };
         });
 
@@ -45,6 +48,8 @@ export default function usePostCharacterLimit(props) {
         switch (providerId) {
             case 'mastodon':
                 return Mastodon.getPostLength(text);
+            case 'bluesky':
+                return Bluesky.getPostLength(text);
             case 'twitter':
                 return Twitter.getTweetLength(text);
             default:

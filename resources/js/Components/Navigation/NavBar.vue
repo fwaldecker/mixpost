@@ -2,10 +2,10 @@
 import {inject} from "vue";
 import MenuIcon from "@/Icons/Menu.vue"
 
-const appContext = inject('appContext');
+const appCtx = inject('appCtx');
 
 const toggleAside = () => {
-    appContext.showAside = !appContext.showAside;
+    appCtx.showAside = !appCtx.showAside;
 }
 </script>
 <template>

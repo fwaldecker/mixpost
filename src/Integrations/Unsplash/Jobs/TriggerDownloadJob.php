@@ -7,9 +7,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Inovector\Mixpost\Contracts\QueueWorkspaceAware;
 use Inovector\Mixpost\Integrations\Unsplash\Unsplash;
 
-class TriggerDownloadJob implements ShouldQueue
+class TriggerDownloadJob implements ShouldQueue, QueueWorkspaceAware
 {
     use Dispatchable;
     use InteractsWithQueue;

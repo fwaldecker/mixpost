@@ -37,7 +37,7 @@ abstract class Report implements ProviderReports
             $value = $total !== null ? intval($total) : null;
 
             return [
-                'label' => $item->format('M j'),
+                'label' => $item->translatedFormat('M j'),
                 'value' => $firstDate ? ($item->toDateString() >= $firstDate ? $value : null) : null,
             ];
         });

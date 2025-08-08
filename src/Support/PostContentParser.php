@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Inovector\Mixpost\Models\Account;
 use Inovector\Mixpost\Models\Media;
 use Inovector\Mixpost\Models\Post;
+use Inovector\Mixpost\Models\Variable;
 
 class PostContentParser
 {
@@ -64,8 +65,18 @@ class PostContentParser
         }
 
         $decode = html_entity_decode($result);
+        $stripTags = strip_tags($decode); // TODO: Add a whitelist of allowed tags (e.g. <3)
 
-        return strip_tags($decode);
+        $variables = Variable::pluck('value', 'name')->toArray();
+
+        $variables['account'] = $this->account->name;
+        $variables['platform'] = $this->account->providerName();
+
+        return str_replace(
+            Arr::map(array_keys($variables), fn($variable) => '{{' . $variable . '}}'),
+            array_values($variables),
+            $stripTags
+        );
     }
 
     public function formatMedia(array $ids): Collection

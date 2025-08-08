@@ -25,6 +25,10 @@ const useEditor = () => {
         emitter.emit('insertContent', {editorId, text});
     }
 
+    const replaceContent = ({editorId, text}) => {
+        emitter.emit('replaceContent', {editorId, text});
+    }
+
     const focusEditor = ({editorId}) => {
         emitter.emit('focusEditor', {editorId});
     }
@@ -73,9 +77,10 @@ const useEditor = () => {
         defaultExtensions,
         insertEmoji,
         insertContent,
+        replaceContent,
         focusEditor,
         isDocEmpty,
-        getTextFromHtmlString,
+        getTextFromHtmlString
     }
 }
 

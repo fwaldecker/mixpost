@@ -1,18 +1,21 @@
 <script setup>
 import {ref} from "vue";
+import {useI18n} from "vue-i18n";
 import {router} from "@inertiajs/vue3";
 import useNotifications from "@/Composables/useNotifications";
 import Panel from "@/Components/Surface/Panel.vue";
 import Input from "@/Components/Form/Input.vue";
 import PrimaryButton from "@/Components/Button/PrimaryButton.vue";
-import HorizontalGroup from "@/Components/Layout/HorizontalGroup.vue";
 import Error from "@/Components/Form/Error.vue";
 import ReadDocHelp from "@/Components/Util/ReadDocHelp.vue";
-import TenorIcon from "@/Icons/Tenor.vue";
-import LabelSuffix from "../Form/LabelSuffix.vue";
-import Flex from "../Layout/Flex.vue";
 import Checkbox from "../Form/Checkbox.vue";
+import Flex from "../Layout/Flex.vue";
 import Label from "../Form/Label.vue";
+import Tenor from "../../Icons/Tenor.vue";
+import LabelSuffix from "../Form/LabelSuffix.vue";
+import HorizontalGroup from "../Layout/HorizontalGroup.vue";
+
+const {t: $t} = useI18n()
 
 const props = defineProps({
     form: {
@@ -30,7 +33,7 @@ const save = () => {
     router.put(route('mixpost.services.update', {service: 'tenor'}), props.form, {
         preserveScroll: true,
         onSuccess() {
-            notify('success', 'Tenor service have been saved');
+            notify('success', $t('service.service_saved', {service: 'Tenor'}));
         },
         onError: (err) => {
             errors.value = err;
@@ -42,16 +45,16 @@ const save = () => {
     <Panel>
         <template #title>
             <div class="flex items-center">
-                <span class="mr-xs"><TenorIcon/></span>
+                <span class="mr-xs"><Tenor/></span>
                 Tenor
             </div>
         </template>
 
         <template #description>
-            <p>With Tenor you can use GIF's directly in Mixpost.</p>
+            <p>{{ $t('service.tenor.use_gif') }}</p>
             <p>
                 <a href="https://console.cloud.google.com/" class="link" target="_blank">
-                  Create an App on Google Console</a>.
+                    {{ $t('service.create_app', {name: 'Google Console'}) }}</a>.
             </p>
             <ReadDocHelp :href="`${$page.props.mixpost.docs_link}/services/media/tenor`"
                          class="mt-xs"/>
@@ -75,12 +78,12 @@ const save = () => {
 
         <HorizontalGroup class="mt-lg">
             <template #title>
-               Status
+                {{ $t('general.status') }}
             </template>
 
             <Flex :responsive="false" class="items-center">
                 <Checkbox v-model:checked="form.active" id="active"/>
-                <Label for="active" class="mb-0!">Active</Label>
+                <Label for="active" class="mb-0!">{{ $t('general.active') }}</Label>
             </Flex>
 
             <template #footer>
@@ -88,6 +91,6 @@ const save = () => {
             </template>
         </HorizontalGroup>
 
-        <PrimaryButton @click="save" class="mt-lg">Save</PrimaryButton>
+        <PrimaryButton @click="save" class="mt-lg">{{ $t('general.save') }}</PrimaryButton>
     </Panel>
 </template>

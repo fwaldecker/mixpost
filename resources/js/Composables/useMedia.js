@@ -1,19 +1,23 @@
 import NProgress from 'nprogress'
 import {computed, nextTick, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
 import {debounce} from "lodash";
 import useNotifications from "@/Composables/useNotifications";
 
-const useMedia = (routeName = 'mixpost.media.fetchUploads', routeParams = {}) => {
+const useMedia = (routeName = 'mixpost.media.fetchUploads',
+                  routeParams = {},
+                  maxSelectedItems = -1,
+                  mimeTypes = []) => {
+    const {t: $t} = useI18n();
     const {notify} = useNotifications();
 
     const activeTab = ref('uploads');
 
     const tabs = computed(() => {
-        return {
-            'uploads': 'Upload',
-            'stock': 'Stock Photos',
-            'gifs': 'GIFs'
-        };
+        const sources = ['uploads', 'stock'];
+        if(!mimeTypes.length || mimeTypes.length && mimeTypes.includes('image/gif'))
+            sources.push('gifs');
+        return sources;
     })
 
     const isLoaded = ref(false);
@@ -29,7 +33,11 @@ const useMedia = (routeName = 'mixpost.media.fetchUploads', routeParams = {}) =>
         const index = selected.value.findIndex(item => item.id === media.id);
 
         if (index < 0 && !media.hasOwnProperty('error')) {
-            selected.value.push(media);
+            if(maxSelectedItems === 1) {
+                selected.value = [media];
+            } else if(selected.value.length < maxSelectedItems || maxSelectedItems === -1){ // -1 means infinite
+                selected.value.push(media);
+            }
         }
 
         if (index >= 0) {
@@ -54,35 +62,37 @@ const useMedia = (routeName = 'mixpost.media.fetchUploads', routeParams = {}) =>
 
         NProgress.start();
 
-        axios.get(route(routeName, routeParams), {
-            params: {
-                page: page.value,
-                keyword: keyword.value
-            }
-        }).then(function (response) {
-            const nextLink = response.data.links.next;
+        const params = {
+            page: page.value,
+            keyword: keyword.value,
+            mime_types: mimeTypes
+        };
 
-            if (nextLink) {
-                page.value = response.data.links.next.split('?page=')[1];
-            }
+        axios.get(route(routeName, routeParams), { params })
+            .then(function (response) {
+                const nextLink = response.data.links.next;
 
-            if (!nextLink) {
-                page.value = 0;
-            }
+                if (nextLink) {
+                    page.value = response.data.links.next.split('?page=')[1];
+                }
 
-            if (!appendResult) {
-                items.value = response.data.data;
-            }
+                if (!nextLink) {
+                    page.value = 0;
+                }
 
-            if (appendResult) {
-                items.value = [...items.value, ...response.data.data];
-            }
-        }).catch(() => {
-            notify('error', 'Error retrieving media. Try again!');
-        }).finally(() => {
-            NProgress.done();
-            isLoaded.value = true;
-        });
+                if (!appendResult) {
+                    items.value = response.data.data;
+                }
+
+                if (appendResult) {
+                    items.value = [...items.value, ...response.data.data];
+                }
+            }).catch(() => {
+                notify('error', $t('media.error_retrieving_media'));
+            }).finally(() => {
+                NProgress.done();
+                isLoaded.value = true;
+            });
     }
 
     const downloadExternal = (items, callback) => {
@@ -95,7 +105,7 @@ const useMedia = (routeName = 'mixpost.media.fetchUploads', routeParams = {}) =>
         }).then((response) => {
             callback(response);
         }).catch(() => {
-            notify('error', 'Error downloading media. Try again!');
+            notify('error', $t('media.error_downloading_media'));
         }).finally(() => {
             isDownloading.value = false;
             NProgress.done();
@@ -105,6 +115,18 @@ const useMedia = (routeName = 'mixpost.media.fetchUploads', routeParams = {}) =>
 
     const removeItems = (ids) => {
         items.value = items.value.filter((item) => !ids.includes(item.id));
+    }
+
+    const getMediaCrediting = (mediaCollection) => {
+        let text = '';
+
+        mediaCollection.forEach((item) => {
+            if (item.source === 'Unsplash') {
+                text += `\nPhoto by ${item.author} on Unsplash`;
+            }
+        });
+
+        return text;
     }
 
     const deletePermanently = (items, callback) => {
@@ -118,7 +140,7 @@ const useMedia = (routeName = 'mixpost.media.fetchUploads', routeParams = {}) =>
         }).then(() => {
             callback();
         }).catch(() => {
-            notify('error', 'Error deleting media. Try again!');
+            notify('error', $t('media.error_deleting_media'));
         }).finally(() => {
             isDeleting.value = false;
             NProgress.done();
@@ -156,6 +178,7 @@ const useMedia = (routeName = 'mixpost.media.fetchUploads', routeParams = {}) =>
         items,
         endlessPagination,
         selected,
+        getMediaCrediting,
         downloadExternal,
         deletePermanently,
         removeItems,

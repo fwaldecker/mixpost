@@ -22,27 +22,19 @@ defineProps({
 </script>
 <template>
     <template v-if="!external">
-        <Link :href="url"
-              class="py-xs flex flex-row items-center space-x-md rtl:space-x-reverse transition ease-in-out duration-200"
-              :class="{'text-gray-900': active, 'text-gray-400 hover:text-gray-700': !active}">
-            <div>
-                <slot name="icon"/>
-            </div>
+        <Link :href="url" class="py-xs flex flex-row items-center space-x-md rtl:space-x-reverse transition ease-in-out duration-200" :class="{'text-gray-900': active, 'text-gray-400 hover:text-gray-700': !active}">
+            <div><slot name="icon" /></div>
             <div class="font-medium tracking-tight rtl:tracking-normal">
-                <slot/>
+                <slot />
             </div>
         </Link>
     </template>
 
     <template v-else>
-        <a :href="url" :target="externalTarget"
-           class="py-xs flex flex-row items-center space-x-4 transition ease-in-out duration-200"
-           :class="{'text-gray-900': active, 'text-gray-400 hover:text-gray-700': !active}">
-            <div>
-                <slot name="icon"/>
-            </div>
+        <a :href="url" :target="externalTarget" class="py-xs flex flex-row items-center space-x-4 transition ease-in-out duration-200" :class="{'text-gray-900': active, 'text-gray-400 hover:text-gray-700': !active}">
+            <div><slot name="icon" /></div>
             <div class="font-medium tracking-tight rtl:tracking-normal">
-                <slot/>
+                <slot />
             </div>
         </a>
     </template>

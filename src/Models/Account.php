@@ -2,25 +2,32 @@
 
 namespace Inovector\Mixpost\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Inovector\Mixpost\Casts\AccountMediaCast;
 use Inovector\Mixpost\Casts\EncryptArrayObject;
 use Inovector\Mixpost\Concerns\Model\HasUuid;
-use Inovector\Mixpost\Events\AccountUnauthorized;
+use Inovector\Mixpost\Concerns\OwnedByWorkspace;
+use Inovector\Mixpost\Contracts\SocialProvider;
+use Inovector\Mixpost\Events\Account\AccountUnauthorized;
 use Inovector\Mixpost\Facades\SocialProviderManager;
 use Inovector\Mixpost\SocialProviders\Mastodon\MastodonProvider;
+use Inovector\Mixpost\Support\AccountSuffix;
 use Inovector\Mixpost\Support\SocialProviderPostConfigs;
 
 class Account extends Model
 {
     use HasFactory;
     use HasUuid;
+    use OwnedByWorkspace;
 
     protected $table = 'mixpost_accounts';
 
     protected $fillable = [
+        'uuid',
         'name',
         'username',
         'media',
@@ -47,16 +54,26 @@ class Account extends Model
     protected static function booted()
     {
         static::updated(function ($account) {
-            if ($account->wasChanged('media')) {
+            if ($account->wasChanged('media') && Arr::has($account->getOriginal('media'), 'disk')) {
                 Storage::disk($account->getOriginal('media')['disk'])->delete($account->getOriginal('media')['path']);
             }
         });
 
         static::deleted(function ($account) {
-            if ($account->media) {
+            if ($account->media && Arr::has($account->media, 'disk')) {
                 Storage::disk($account->media['disk'])->delete($account->media['path']);
             }
         });
+    }
+
+    public function scopeProvider(Builder $query, string|SocialProvider $provider): void
+    {
+        $query->where('provider', $provider instanceof SocialProvider ? $provider->identifier() : $provider);
+    }
+
+    public function suffix(): string
+    {
+        return AccountSuffix::getValue($this->data ?? []);
     }
 
     public function image(): ?string
@@ -87,6 +104,11 @@ class Account extends Model
         }
 
         return $this->providerClass = SocialProviderManager::providers()[$this->provider] ?? null;
+    }
+
+    public function relationships(): array
+    {
+        return Arr::get($this->data, 'relationships', []);
     }
 
     public function providerName(): string
@@ -143,6 +165,13 @@ class Account extends Model
     public function setAuthorized(): void
     {
         $this->authorized = true;
+        $this->save();
+    }
+
+    public function updateAccessToken(array $data): void
+    {
+        $this->access_token = $data;
+
         $this->save();
     }
 }

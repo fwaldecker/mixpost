@@ -4,6 +4,8 @@ import CheckIcon from "@/Icons/Check.vue"
 import ExclamationIcon from "@/Icons/Exclamation.vue"
 import XIcon from "@/Icons/X.vue"
 
+const emit = defineEmits(['close']);
+
 const props = defineProps({
     variant: {
         type: String,
@@ -19,6 +21,7 @@ const show = ref(true);
 
 const close = () => {
     show.value = false
+    emit('close')
 }
 
 const variantIcon = computed(() => {
@@ -40,19 +43,19 @@ const variantColorClasses = computed(() => {
 });
 </script>
 <template>
-    <div v-if="show" class="flex p-md rounded-md bg-indigo-800">
-        <div class="flex items-center justify-between">
-           <div class="flex items-center">
-               <div>
-                   <div :class="variantColorClasses"
-                        class="w-8 h-8 rounded-full flex items-center justify-center mr-sm">
-                       <component :is="variantIcon"/>
-                   </div>
-               </div>
-               <div class="text-gray-200">
-                   <slot/>
-               </div>
-           </div>
+    <div v-if="show" class="flex p-md rounded-md bg-alert">
+        <div class="w-full flex items-center justify-between">
+            <div class="flex items-center">
+                <div>
+                    <div :class="variantColorClasses"
+                         class="w-8 h-8 rounded-full flex items-center justify-center mr-sm rtl:mr-0 rtl:ml-sm">
+                        <component :is="variantIcon"/>
+                    </div>
+                </div>
+                <div class="text-alert-context">
+                    <slot/>
+                </div>
+            </div>
             <template v-if="closeable">
                 <button @click="close" class="ml-2xl">
                     <XIcon class="text-gray-200"/>

@@ -14,6 +14,7 @@ import {
 } from "chart.js";
 
 import zoomPlugin from 'chartjs-plugin-zoom';
+import useTheme from "../../Composables/useTheme";
 
 Chart.register(BarController, LineController, PointElement, LineElement, BarElement, CategoryScale, LinearScale, Tooltip, zoomPlugin);
 
@@ -36,6 +37,8 @@ const resetZoom = () => {
     chartRef.value.resetZoom();
     zoomed.value = false;
 }
+
+const theme = useTheme();
 
 onMounted(() => {
     chartRef.value = new Chart(dom.value.getContext('2d'), {
@@ -68,7 +71,7 @@ onMounted(() => {
                     },
                 },
                 tooltip: {
-                    backgroundColor: '#1F1B4B',
+                    backgroundColor: theme.getColors().primary_colors[800],
                     titleSpacing: 4,
                     bodySpacing: 8,
                     padding: 20,
@@ -165,9 +168,10 @@ watch(() => props.data, (newValue, oldValue) => {
             <canvas ref="dom" style="position: relative; max-height:300px; width:100%; max-width: 100%;"></canvas>
         </div>
         <div class="text-right mt-4">
-            <small class="text-gray-500 text-sm">You can drag the chart to zoom.</small>
+            <small class="text-gray-500 text-sm">{{ $t('vendor.chart.drag_chart') }}</small>
             <button v-if="zoomed" @click="resetZoom"
-                    class="ml-xs text-sm hover:text-indigo-500 transition-colors ease-in-out duration-200">Reset zoom
+                    class="ml-xs text-sm hover:text-primary-500 transition-colors ease-in-out duration-200">
+                {{ $t('vendor.chart.reset_zoom') }}
             </button>
         </div>
     </div>

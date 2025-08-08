@@ -12,9 +12,10 @@ const useSettings = () => {
 
     return {
         getSetting,
+        locale: settings.value.locale,
         timeZone: settings.value.timezone,
-        timeFormat: settings.value.time_format,
-        weekStartsOn: settings.value.week_starts_on
+        timeFormat: parseInt(settings.value.time_format),
+        weekStartsOn: parseInt(settings.value.week_starts_on)
     }
 }
 

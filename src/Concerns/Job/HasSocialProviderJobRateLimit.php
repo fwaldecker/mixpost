@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 
 trait HasSocialProviderJobRateLimit
 {
-    public $tries = 0;
+    public $tries = 10;
 
     public $maxExceptions = 1;
 
@@ -23,6 +23,7 @@ trait HasSocialProviderJobRateLimit
             $platform = match ($this->account->provider) {
                 'facebook_page' => 'meta',
                 'facebook_group' => 'meta',
+                'instagram' => 'meta',
                 default => $this->account->provider,
             };
 

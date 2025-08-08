@@ -4,21 +4,41 @@ namespace Inovector\Mixpost\Support;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
+use Inovector\Mixpost\Abstracts\Image;
+use Inovector\Mixpost\Concerns\UsesMimeType;
 use Inovector\Mixpost\Models\Media;
 use Inovector\Mixpost\Contracts\MediaConversion;
+use Inovector\Mixpost\Util;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 
 class MediaUploader
 {
+    use UsesMimeType;
+
     protected UploadedFile $file;
+
     protected string $disk;
+
     protected string $path = '';
+
+    protected ?array $data = null;
+
+    protected int $width;
+
+    protected int $height;
+
     protected array $conversions;
 
     public function __construct(UploadedFile $file)
     {
         $this->setFile($file);
-        $this->disk(config('mixpost.disk'));
+
+        $this->disk(Util::config('disk'));
+
+        $this->width = Image::LARGE_WIDTH;
+        $this->height = Image::LARGE_HEIGHT;
     }
 
     public static function fromFile(UploadedFile $file): static
@@ -47,6 +67,27 @@ class MediaUploader
         return $this;
     }
 
+    public function data(array $array): static
+    {
+        $this->data = !empty($array) ? $array : null;
+
+        return $this;
+    }
+
+    public function width(int $width): static
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function height(int $height): static
+    {
+        $this->height = $height;
+
+        return $this;
+    }
+
     public function conversions(array $array): static
     {
         $this->conversions = $array;
@@ -56,26 +97,41 @@ class MediaUploader
 
     public function upload(): array
     {
-        $path = $this->filesystem()->putFile($this->path, $this->file, 'public');
+        $mimeType = $this->file->getMimeType();
+        $filesystem = $this->filesystem();
 
-        if (!$path) {
+        // Determine upload path
+        $filePath = $this->isImage($mimeType) && !$this->isGifImage($mimeType)
+            ? $this->uploadImage()
+            : $filesystem->putFile($this->path, $this->file, 'public');
+
+        if (!$filePath) {
             throw new \Exception("The file was not uploaded. Check your $this->disk driver configuration.");
         }
 
+        $size = $filesystem->size($filePath);
+        $conversions = $this->performConversions($filePath);
+        $totalSize = $size + collect($conversions)->sum('size');
+
         return [
             'name' => $this->file->getClientOriginalName(),
-            'mime_type' => $this->file->getMimeType(),
-            'size' => $this->file->getSize(),
-            'size_total' => $this->file->getSize() + 0,
+            'mime_type' => $mimeType,
+            'size' => $size,
+            'size_total' => $totalSize,
             'disk' => $this->disk,
-            'path' => $path,
-            'conversions' => $this->performConversions($path)
+            'is_local_driver' => $filesystem->getAdapter() instanceof LocalFilesystemAdapter,
+            'path' => $filePath,
+            'url' => $filesystem->url($filePath),
+            'conversions' => $conversions,
+            'data' => $this->data ?: null,
         ];
     }
 
     public function uploadAndInsert()
     {
-        return Media::create($this->upload());
+        return Media::create(
+            Arr::only($this->upload(), ['name', 'mime_type', 'size', 'size_total', 'disk', 'path', 'conversions', 'data'])
+        );
     }
 
     protected function performConversions(string $filepath): array
@@ -97,6 +153,17 @@ class MediaUploader
 
             return $perform->get();
         })->filter()->values()->toArray();
+    }
+
+    protected function uploadImage(): string
+    {
+        $image = ImageResizer::make($this->file);
+
+        $image->disk($this->disk)
+            ->path($this->path)
+            ->resize(Image::LARGE_WIDTH, Image::LARGE_HEIGHT);
+
+        return $image->getDestinationFilePath();
     }
 
     protected function filesystem(): Filesystem

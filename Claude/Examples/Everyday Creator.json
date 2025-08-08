@@ -1,0 +1,4805 @@
+{
+  "name": "Everyday Creator (IN USE)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "creator",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        2576
+      ],
+      "id": "431a01cf-37d2-44d6-9579-fa01df8b9e62",
+      "name": "Webhook",
+      "webhookId": "b71d2936-b100-4cc7-96bf-8148f24a13ea"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Variables').item.json.webhook_body.action.CONTENT[0].name }} {{ $('Split Out1').item.json.style_name }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Get a record').item.json['Folder ID'] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1744,
+        2000
+      ],
+      "id": "d7cbb34b-b2e4-4c56-9040-3ac219b93dfb",
+      "name": "Upload to Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "rqOZTBH7PEf8E73a",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Quote on B-Roll Video BG✅",
+        "height": 320,
+        "width": 2720,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        208,
+        3696
+      ],
+      "typeVersion": 1,
+      "id": "0d922820-acef-429e-8b57-ac3dac8e17d3",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Creative Director",
+        "height": 480,
+        "width": 2300,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        1920
+      ],
+      "typeVersion": 1,
+      "id": "5ba47a6b-5b2f-4c70-854d-e004283f6b42",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# Initialize Content",
+        "height": 500,
+        "width": 2460,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        528,
+        1024
+      ],
+      "typeVersion": 1,
+      "id": "7414e172-069d-4622-946f-379ae06a1749",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.placid.app/api/rest/images",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"template_uuid\": \"{{ $('Webhook').item.json.body.variables.TEXT_BOX_FOR_VIDEO }}\",\n  \"layers\": {\n    \"Main Text\": {\n      \"text\": {{ JSON.stringify($('Get a record').item.json.Description) }}\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        3744
+      ],
+      "id": "91aab4e7-93f5-4b20-be11-d2977667dbcb",
+      "name": "HTTP Request4",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JMY53dTaSMmX8vtJ",
+          "name": "NCA Toolkit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cf600a04-0957-49c6-9735-0cb037fc30e7",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "finished",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        864,
+        3744
+      ],
+      "id": "e56a5ae5-45b8-4c03-baf6-3cf578e615f6",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('HTTP Request4').item.json.polling_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        3744
+      ],
+      "id": "afe11559-74c7-4b8e-a54a-d7e51bc085d7",
+      "name": "HTTP Request5",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JMY53dTaSMmX8vtJ",
+          "name": "NCA Toolkit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        3744
+      ],
+      "id": "86891f1e-62d1-4dce-8010-d16082f04579",
+      "name": "Wait1",
+      "webhookId": "c0156ba4-d487-4dc7-ae2d-ec64dbcf7e07"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://nca.everydaycreator.org/v1/ffmpeg/compose",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json[\"ffmpeg_json\"]) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2144,
+        3744
+      ],
+      "id": "1d5a502f-51f4-4c83-b22e-5162a4dfb2a9",
+      "name": "HTTP Request7",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JMY53dTaSMmX8vtJ",
+          "name": "NCA Toolkit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('HTTP Request5').item.json.image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1104,
+        3744
+      ],
+      "id": "d2e0087b-3ffc-41f5-b9c5-d5450a1f2293",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.body.variables.BASE_ID }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.body.variables.CONTENT_TABLE }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get a record').item.json.id }}",
+            "Status": "Needs Review",
+            "📥 Image": "={{ $input.all().map(item => ({\n  url: item.json.webContentLink,\n  filename: item.json.name\n})) }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "CID",
+              "displayName": "CID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Action",
+              "displayName": "Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content Type",
+              "displayName": "Content Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Idea",
+                  "value": "Idea"
+                },
+                {
+                  "name": "Article",
+                  "value": "Article"
+                },
+                {
+                  "name": "Email",
+                  "value": "Email"
+                },
+                {
+                  "name": "Post",
+                  "value": "Post"
+                },
+                {
+                  "name": "Quote",
+                  "value": "Quote"
+                },
+                {
+                  "name": "Coaching Calls",
+                  "value": "Coaching Calls"
+                },
+                {
+                  "name": "VIdeo",
+                  "value": "VIdeo"
+                },
+                {
+                  "name": "Clips",
+                  "value": "Clips"
+                },
+                {
+                  "name": "Image",
+                  "value": "Image"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Percolating",
+                  "value": "Percolating"
+                },
+                {
+                  "name": "Planning",
+                  "value": "Planning"
+                },
+                {
+                  "name": "Create",
+                  "value": "Create"
+                },
+                {
+                  "name": "Needs Review",
+                  "value": "Needs Review"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Archive",
+                  "value": "Archive"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Last Modified",
+              "displayName": "Last Modified",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "AUTO_ID",
+              "displayName": "AUTO_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Publish Date",
+              "displayName": "Publish Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Text URL",
+              "displayName": "Text URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Text Document",
+              "displayName": "Text Document",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "📥 Image",
+              "displayName": "📥 Image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "📥 Video",
+              "displayName": "📥 Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Rate",
+              "displayName": "Rate",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Folder URL",
+              "displayName": "Folder URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Folder",
+              "displayName": "Folder",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Initialized",
+              "displayName": "Initialized",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "AUTO_ID (from Action)",
+              "displayName": "AUTO_ID (from Action)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Doc ID",
+              "displayName": "Doc ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Publish URL",
+              "displayName": "Publish URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Published",
+              "displayName": "Published",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Parent Video",
+              "displayName": "Parent Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Folder ID",
+              "displayName": "Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Brands",
+              "displayName": "Brands",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "SRT URL (from Original Idea)",
+              "displayName": "SRT URL (from Original Idea)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Video URL (from Original Idea)",
+              "displayName": "Video URL (from Original Idea)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "🟡 Webhook URL (from Action)",
+              "displayName": "🟡 Webhook URL (from Action)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Parent Idea",
+              "displayName": "Parent Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "From field: Parent Idea",
+              "displayName": "From field: Parent Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID (from Brands)",
+              "displayName": "Record ID (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Last Job ID",
+              "displayName": "Last Job ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Videos",
+              "displayName": "Videos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Record ID (from Brands) 2",
+              "displayName": "Record ID (from Brands) 2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Prompts Doc (from Brands)",
+              "displayName": "Prompts Doc (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Design Kit (from Brands)",
+              "displayName": "Design Kit (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Brand Kit (from Brands)",
+              "displayName": "Brand Kit (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Google Folder Root ID (from Brands)",
+              "displayName": "Google Folder Root ID (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name (from Brands)",
+              "displayName": "Name (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2448,
+        2128
+      ],
+      "id": "fb456ead-af9d-4c63-b0a8-35e1b4816962",
+      "name": "Add Image > Article Record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OvFMKmqxDW8MPXe4",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "={{ $('Code').item.json.baseId }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Code').item.json.contentTable }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Code').item.json.recordIdToUpdate }}",
+            "Status": "Needs Review",
+            "📥 Video": "=[\n  {\n    \"url\": \"{{ $json.response[0].file_url }}\"\n  }\n]"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "CID",
+              "displayName": "CID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content Type",
+              "displayName": "Content Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Coaching Calls",
+                  "value": "Coaching Calls"
+                },
+                {
+                  "name": "Idea",
+                  "value": "Idea"
+                },
+                {
+                  "name": "Rough Draft",
+                  "value": "Rough Draft"
+                },
+                {
+                  "name": "Text Post",
+                  "value": "Text Post"
+                },
+                {
+                  "name": "Article",
+                  "value": "Article"
+                },
+                {
+                  "name": "Tweet/Quote",
+                  "value": "Tweet/Quote"
+                },
+                {
+                  "name": "Image",
+                  "value": "Image"
+                },
+                {
+                  "name": "VIdeo",
+                  "value": "VIdeo"
+                },
+                {
+                  "name": "Email",
+                  "value": "Email"
+                },
+                {
+                  "name": "Rough",
+                  "value": "Rough"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Percolating",
+                  "value": "Percolating"
+                },
+                {
+                  "name": "Planning",
+                  "value": "Planning"
+                },
+                {
+                  "name": "Create",
+                  "value": "Create"
+                },
+                {
+                  "name": "Needs Review",
+                  "value": "Needs Review"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Archive",
+                  "value": "Archive"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Last Modified",
+              "displayName": "Last Modified",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "AUTO_ID",
+              "displayName": "AUTO_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Publish Date",
+              "displayName": "Publish Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Raw Idea Text",
+              "displayName": "Raw Idea Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Text URL",
+              "displayName": "Text URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Text Document",
+              "displayName": "Text Document",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "📥 Image",
+              "displayName": "📥 Image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "📥 Video",
+              "displayName": "📥 Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Rate",
+              "displayName": "Rate",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Folder URL",
+              "displayName": "Folder URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Folder",
+              "displayName": "Folder",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Initialized",
+              "displayName": "Initialized",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Action",
+              "displayName": "Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "AUTO_ID (from Action)",
+              "displayName": "AUTO_ID (from Action)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Webhook URL (from Action)",
+              "displayName": "Webhook URL (from Action)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Doc ID",
+              "displayName": "Doc ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Publish URL",
+              "displayName": "Publish URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Published",
+              "displayName": "Published",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Original Idea",
+              "displayName": "Original Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2384,
+        3744
+      ],
+      "id": "fdd46acd-f04e-4787-abfa-e6a4b83e7363",
+      "name": "Update Record [Text To Image]1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OvFMKmqxDW8MPXe4",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items (these are just file IDs)\nconst allItems = $input.all();\n\nconsole.log(`Received ${allItems.length} file IDs from Google Drive`);\n\nif (allItems.length === 0) {\n    throw new Error(\"No file IDs received from Google Drive\");\n}\n\n// Since we know these are all video files from the B-roll folder,\n// we can directly select a random one\nconst randomIndex = Math.floor(Math.random() * allItems.length);\nconst selectedVideoId = allItems[randomIndex].json.id;\n\nconsole.log(`Selected video ID: ${selectedVideoId}`);\n\n// Build the video URL using the file ID\nconst videoUrl = `https://drive.google.com/uc?export=download&id=${selectedVideoId}`;\n\n// Get the uploaded image URL from the previous node\nlet quoteImageUrl = '';\ntry {\n    const uploadedImageData = $node[\"Google Drive: Upload Quote Image\"].json;\n    quoteImageUrl = uploadedImageData.webContentLink || `https://drive.google.com/uc?export=download&id=${uploadedImageData.id}`;\n} catch (e) {\n    throw new Error(\"Could not find uploaded image URL: \" + e.message);\n}\n\n// Get other required data for the final Airtable update\nconst airtableData = $node[\"Get a record\"].json;\nconst webhookData = $node[\"Webhook\"].json;\n\nconsole.log(`Video URL: ${videoUrl}`);\nconsole.log(`Image URL: ${quoteImageUrl}`);\n\n// Return the FFmpeg payload\nreturn [{\n    json: {\n        ffmpeg_json: {\n            id: \"quote-overlay-video\",\n            inputs: [\n                {\n                    file_url: videoUrl,\n                    options: [{ option: \"-t\", argument: 7 }]\n                },\n                {\n                    file_url: quoteImageUrl\n                }\n            ],\n            filters: [\n                { filter: \"[0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black[bg]\" },\n                { filter: \"[1:v]scale=1080:1080[quote]\" },\n                { filter: \"[bg][quote]overlay=(W-w)/2:(H-h)/2[outv]\" }\n            ],\n            outputs: [\n                {\n                    options: [\n                        { option: \"-map\", argument: \"[outv]\" },\n                        { option: \"-c:v\", argument: \"libx264\" },\n                        { option: \"-preset\", argument: \"fast\" },\n                        { option: \"-crf\", argument: 23 },\n                        { option: \"-t\", argument: 7 }\n                    ]\n                }\n            ],\n            metadata: {\n                thumbnail: true,\n                filesize: true,\n                duration: true,\n                bitrate: true,\n                encoder: true\n            }\n        },\n        // Include data for the final Airtable update\n        baseId: webhookData.body.variables.BASE_ID,\n        contentTable: webhookData.body.variables.CONTENT_TABLE,\n        recordIdToUpdate: airtableData.id\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        3744
+      ],
+      "id": "a1aa4aee-9a98-477d-8408-e1d473358400",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "=18mncOwTbTsmO_6VVXiMRS0K3QOWZGUa8",
+            "mode": "id"
+          }
+        },
+        "options": {
+          "fields": [
+            "id"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1664,
+        3744
+      ],
+      "id": "0a8e0e5e-7f7c-41ab-a9d4-eba8cb6b3c39",
+      "name": "Google Drive: List B-Roll Videos",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "rqOZTBH7PEf8E73a",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=data",
+        "name": "={{ $('Get a record').item.json.CID }} - Video Quote Image",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Get a record').item.json['Folder ID'] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1376,
+        3744
+      ],
+      "id": "dc191fd1-8f84-4a30-8d04-0d19be453c87",
+      "name": "Google Drive: Upload Quote Image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "rqOZTBH7PEf8E73a",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Get a record').item.json['Doc ID'] }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -992,
+        2576
+      ],
+      "id": "3b41f4c3-2d4b-475b-9e84-7bf4447eec50",
+      "name": "Get Content Doc",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "G6iON3SaK1WrsMH3",
+          "name": "Google Docs account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// The AI returns a single item with a raw text string in the 'output' field.\n// First, get the raw text output from the first input item.\nconst aiOutput = $input.first().json.output;\n\n// --- FINAL, ROBUST PARSER ---\nconst clips = [];\n// This new regex handles both \"Clip1:\" and \"**Clip 1:**\" formats\nconst clipRegex = /(?:\\*\\*)?Clip\\s*(\\d+):\\s*Description:\\s*(.*?)\\s*Clip Contents:\\s*([\\s\\S]*?)(?=\\s*(?:\\*\\*)?Clip\\s*\\d+:|$)/g;\n\nlet clipMatch;\nwhile ((clipMatch = clipRegex.exec(aiOutput)) !== null) {\n    clips.push({\n        clip_number: parseInt(clipMatch[1].trim()),\n        description: clipMatch[2].trim(),\n        full_transcript: clipMatch[3].trim(),\n    });\n}\n\n// Try to get VTT content from various sources\nlet vttContent = null;\n\n// First, try to get it from the workflow's Variables node if available\ntry {\n    const variablesNode = $('Variables');\n    if (variablesNode && variablesNode.first() && variablesNode.first().json.vtt_content) {\n        vttContent = variablesNode.first().json.vtt_content;\n    }\n} catch (error) {\n    console.log('Could not access VTT from Variables node:', error.message);\n}\n\n// If not found in Variables, try to get from Download VTT node\nif (!vttContent) {\n    try {\n        const downloadVttNode = $('Download VTT');\n        if (downloadVttNode && downloadVttNode.first() && downloadVttNode.first().json.data) {\n            vttContent = downloadVttNode.first().json.data;\n        }\n    } catch (error) {\n        console.log('Could not access VTT from Download VTT node:', error.message);\n    }\n}\n\n// If still not found, try from Extract from File using .first() instead of .item\nif (!vttContent) {\n    try {\n        const extractNode = $('Extract from File');\n        if (extractNode && extractNode.first() && extractNode.first().json.vtt_content) {\n            vttContent = extractNode.first().json.vtt_content;\n        }\n    } catch (error) {\n        console.log('Could not access VTT from Extract from File node:', error.message);\n    }\n}\n\n// If we still don't have VTT content, return an error with available clips\nif (!vttContent || typeof vttContent !== 'string') {\n    return [{ json: { \n        error: 'No VTT content found or invalid format',\n        debug: {\n            vtt_content_type: typeof vttContent,\n            vtt_content_length: vttContent ? vttContent.length : 0,\n            available_nodes: Object.keys($workflow).filter(key => key !== 'itemIndex'),\n            input_keys: Object.keys($input.first().json)\n        },\n        clips_available: clips.length \n    } }];\n}\n\n// Function to convert VTT time string to seconds\nconst timeToSeconds = (time) => {\n    const parts = time.replace(',', '.').split(':');\n    return parseFloat(parts[0]) * 3600 + parseFloat(parts[1]) * 60 + parseFloat(parts[2]);\n};\n\n// Parse VTT blocks\nconst vttBlocks = [];\nconst vttRegex = /(?:(\\d+)\\s*\\n\\s*)?((\\d{2}:\\d{2}:\\d{2}[,.]?\\d{3})\\s*-->\\s*(\\d{2}:\\d{2}:\\d{2}[,.]?\\d{3}))\\s*\\n([\\s\\S]*?)(?=\\n\\n|\\n\\d|\\nWEBVTT|\\n$|$)/g;\n\nlet match;\nlet blockNumber = 1;\nwhile ((match = vttRegex.exec(vttContent)) !== null) {\n    const startSeconds = timeToSeconds(match[3]);\n    const endSeconds = timeToSeconds(match[4]);\n    vttBlocks.push({\n        num: match[1] ? parseInt(match[1]) : blockNumber,\n        startTime: match[3],\n        endTime: match[4],\n        startSeconds: startSeconds,\n        endSeconds: endSeconds,\n        duration: endSeconds - startSeconds,\n        text: match[5].trim()\n    });\n    blockNumber++;\n}\n\nif (vttBlocks.length === 0) {\n    return [{ json: {\n        error: 'No VTT blocks could be parsed',\n        debug: {\n            content_preview: vttContent.substring(0, 500),\n            content_length: vttContent.length\n        },\n        clips_available: clips.length\n    } }];\n}\n\n// Function to clean text for matching\nconst cleanForMatching = (text) => {\n    return text\n        .replace(/^[^:]*:\\s*/gm, '') // Remove speaker labels\n        .replace(/[^a-zA-Z0-9\\s]/g, ' ') // Replace punctuation with spaces\n        .replace(/\\s+/g, ' ') // Normalize whitespace\n        .toLowerCase()\n        .trim();\n};\n\nconst processedClips = [];\nconst fullVttText = vttBlocks.map(b => cleanForMatching(b.text)).join(' ');\n\n// Helper function for fuzzy matching\nconst findBestMatchIndex = (wordsToSearch, textToSearchIn, minLength = 5) => {\n    for (let i = Math.min(wordsToSearch.length, 10); i >= minLength; i--) {\n        const phrase = wordsToSearch.slice(0, i).join(' ');\n        if (!phrase) continue;\n        const index = textToSearchIn.indexOf(phrase);\n        if (index !== -1) {\n            return { index, phrase };\n        }\n    }\n    return { index: -1, phrase: null };\n};\n\n// Process each clip\nfor (const clip of clips) {\n    const clipTranscript = clip.full_transcript || '';\n    if (!clipTranscript) continue;\n\n    const cleanClipTranscript = cleanForMatching(clipTranscript);\n    const clipWords = cleanClipTranscript.split(' ');\n    \n    // Find the start of the clip\n    const { index: startIndexInVtt, phrase: startMatchPhrase } = findBestMatchIndex(clipWords, fullVttText);\n    if (startIndexInVtt === -1) continue;\n\n    // Find the end of the clip\n    const endClipWords = clipWords.slice(-10);\n    const searchSpaceForEnd = fullVttText.substring(startIndexInVtt + startMatchPhrase.length);\n    const { index: endIndexRelative, phrase: endMatchPhrase } = findBestMatchIndex(endClipWords, searchSpaceForEnd);\n\n    let endIndexInVtt;\n    if (endIndexRelative !== -1) {\n        endIndexInVtt = startIndexInVtt + startMatchPhrase.length + endIndexRelative + endMatchPhrase.length;\n    } else {\n        endIndexInVtt = startIndexInVtt + cleanClipTranscript.length;\n    }\n\n    // Map to VTT blocks\n    let accumulatedChars = 0, startBlock = null, endBlock = null, charOffsetStart = 0, charOffsetEnd = 0;\n    for (let i = 0; i < vttBlocks.length; i++) {\n        const block = vttBlocks[i];\n        const blockTextClean = cleanForMatching(block.text);\n        const blockLength = blockTextClean.length + 1;\n        if (startBlock === null && (accumulatedChars + blockLength) > startIndexInVtt) {\n            startBlock = block;\n            charOffsetStart = startIndexInVtt - accumulatedChars;\n        }\n        if (endBlock === null && (accumulatedChars + blockLength) > endIndexInVtt) {\n            endBlock = block;\n            charOffsetEnd = endIndexInVtt - accumulatedChars;\n        }\n        accumulatedChars += blockLength;\n        if (startBlock && endBlock) break;\n    }\n\n    if (!startBlock || !endBlock || endBlock.num < startBlock.num) continue;\n\n    // Calculate precise timing\n    const startBlockTextClean = cleanForMatching(startBlock.text);\n    const startRatio = Math.max(0, Math.min(1, charOffsetStart / (startBlockTextClean.length || 1)));\n    const accurateStartTime = startBlock.startSeconds + (startBlock.duration * startRatio);\n    \n    const endBlockTextClean = cleanForMatching(endBlock.text);\n    const endRatio = Math.max(0, Math.min(1, charOffsetEnd / (endBlockTextClean.length || 1)));\n    const accurateEndTime = endBlock.startSeconds + (endBlock.duration * endRatio);\n\n    const startIndex = vttBlocks.findIndex(b => b.num === startBlock.num);\n    const endIndex = vttBlocks.findIndex(b => b.num === endBlock.num);\n    const relevantBlocks = vttBlocks.slice(startIndex, endIndex + 1);\n    \n    const vttSegment = relevantBlocks.map(b => \n        `${b.num}\\n${b.startTime} --> ${b.endTime}\\n${b.text}`\n    ).join('\\n\\n');\n\n    processedClips.push({\n        json: {\n            ...clip,\n            startTime: accurateStartTime,\n            endTime: accurateEndTime,\n            srt_segment: vttSegment,\n            startBlock: startBlock.num,\n            endBlock: endBlock.num,\n            blockCount: relevantBlocks.length,\n        }\n    });\n}\n\nreturn processedClips;"
+      },
+      "id": "f856e61d-adb9-46f7-9fd3-1962b2de0e4f",
+      "name": "Process Clip Timing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        2672
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fixed Build Cut Command Code - Works with Airtable clip records\nconst allPayloads = [];\n\nconsole.log(\"Starting Build Cut Command\");\nconsole.log(\"Input items count:\", $input.all().length);\n\n// Get callback URL and video URL from correct sources\nlet callbackUrl = \"\";\nlet baseVideoUrl = \"\";\n\ntry {\n  // Get callback URL from Variables webhook payload\n  const webhookData = $('Variables').first().json.webhook_body;\n  callbackUrl = webhookData.action.CALLBACK_WEBHOOK_URL; // Note: removed triple underscore\n  console.log(\"Callback URL from webhook:\", callbackUrl);\n  \n} catch (error) {\n  console.error(\"Error accessing webhook data:\", error.message);\n  return [];\n}\n\n// Validate we have callback URL\nif (!callbackUrl) {\n  console.error(\"No callback URL found\");\n  return [];\n}\n\nconsole.log(\"Processing\", $input.all().length, \"clip records from Airtable\");\n\n// Loop through every incoming item (Airtable clip records from Get Updated Clip Record)\nfor (let i = 0; i < $input.all().length; i++) {\n  try {\n    const item = $input.all()[i];\n    const clipRecord = item.json;\n    \n    console.log(`Processing Airtable record ${i + 1}:`, clipRecord.id);\n    console.log(\"Available fields:\", Object.keys(clipRecord));\n\n    // Construct video URL using MinIO S3 storage\n    let videoUrl = \"\";\n    try {\n      // Get base URL from Download VTT node\n      const vttData = $('Download VTT').first().json.webhook_body.variables;\n      const minioBaseUrl = vttData.MINIO_STORAGE_URL;\n      \n      // Get filename from Variables node \n      const variablesData = $('Variables').first().json.airtable_record;\n      const videoFileName = variablesData['Shared screen w/ speaker video gdrive id'];\n      \n      // Construct the full video URL\n      videoUrl = `${minioBaseUrl}${videoFileName}`;\n      \n      console.log(\"MinIO Base URL:\", minioBaseUrl);\n      console.log(\"Video filename:\", videoFileName);\n      console.log(\"Constructed video URL:\", videoUrl);\n      \n    } catch (urlError) {\n      console.error(\"Error constructing video URL:\", urlError.message);\n      continue;\n    }\n    \n    if (!videoUrl) {\n      console.error(`No video URL constructed for record ${clipRecord.id}`);\n      continue;\n    }\n\n    // Extract timing data from Airtable record\n    const startTimeFromRecord = clipRecord['Start Time'];\n    const endTimeFromRecord = clipRecord['End Time'];\n    const clipTitle = clipRecord['Clip Description'] || 'Untitled Clip';\n\n    console.log(`Record timing: Start=${startTimeFromRecord}, End=${endTimeFromRecord}`);\n\n    // Validate required fields\n    if (startTimeFromRecord === undefined || startTimeFromRecord === null) {\n      console.error(`Start Time field missing in record ${clipRecord.id}`);\n      continue;\n    }\n    if (endTimeFromRecord === undefined || endTimeFromRecord === null) {\n      console.error(`End Time field missing in record ${clipRecord.id}`);\n      continue;\n    }\n\n    // Calculate clip boundaries with small buffer\n    const startTime = Math.max(0, startTimeFromRecord - 0.2);\n    const endTime = endTimeFromRecord + 0.2;\n    const duration = endTime - startTime;\n\n    if (duration <= 0) {\n      console.error(`Invalid duration (${duration.toFixed(2)}s) for record ${clipRecord.id}`);\n      continue;\n    }\n\n    console.log(`Record ${clipRecord.id} final timing - Start: ${startTime.toFixed(3)}s, End: ${endTime.toFixed(3)}s, Duration: ${duration.toFixed(3)}s`);\n\n    // Configure FFmpeg inputs according to API documentation\n    const inputs = [{\n      file_url: videoUrl,\n      options: [\n        { option: '-ss', argument: startTime.toFixed(3) },\n        { option: '-t', argument: duration.toFixed(3) }\n      ]\n    }];\n\n    // Configure filters (optional fade out)\n    const filters = [];\n    if (duration > 1) {\n      filters.push({\n        filter: \"[0:v]fade=t=out:st=\" + (duration - 0.5).toFixed(3) + \":d=0.5[v]\"\n      });\n    }\n\n    // Configure output options\n    const outputOptions = [];\n    if (filters.length > 0) {\n      outputOptions.push({ option: '-map', argument: '[v]' });\n    } else {\n      outputOptions.push({ option: '-map', argument: '0:v' });\n    }\n    outputOptions.push(\n      { option: '-map', argument: '0:a' },\n      { option: '-c:v', argument: 'libx264' },\n      { option: '-c:a', argument: 'aac' },\n      { option: '-preset', argument: 'fast' },\n      { option: '-crf', argument: 23 },\n      { option: '-movflags', argument: '+faststart' }\n    );\n\n    // Create the complete FFmpeg payload according to API docs\n    // This is the direct API payload structure, not wrapped\n    const ffmpegPayload = {\n      id: clipRecord.id || `clip_${i + 1}_${Date.now()}`,\n      inputs: inputs,\n      outputs: [{\n        options: outputOptions\n      }],\n      webhook_url: callbackUrl,\n      metadata: {\n        thumbnail: true,\n        filesize: true,\n        duration: true,\n        bitrate: true,\n        encoder: true\n      }\n    };\n\n    // Add filters only if they exist\n    if (filters.length > 0) {\n      ffmpegPayload.filters = filters;\n    }\n\n    // Return the payload in the format the HTTP Request node expects\n    allPayloads.push({\n      json: {\n        ffmpegPayload: ffmpegPayload,\n        clipInfo: {\n          id: clipRecord.id,\n          description: clipTitle,\n          duration: duration,\n          startTime: startTime,\n          endTime: endTime\n        }\n      }\n    });\n\n    console.log(`Successfully prepared record ${clipRecord.id}`);\n\n  } catch (error) {\n    console.error(`Error processing record ${i + 1}:`, error.message);\n    console.error(\"Stack:\", error.stack);\n    continue;\n  }\n}\n\nconsole.log(`Prepared ${allPayloads.length} clips for processing`);\n\n// Log first payload for debugging\nif (allPayloads.length > 0) {\n  console.log(\"Sample ffmpegPayload:\", JSON.stringify(allPayloads[0].json.ffmpegPayload, null, 2));\n}\n\nreturn allPayloads;"
+      },
+      "id": "29674fbd-ec02-431f-8fb1-6ed4d450c963",
+      "name": "Build Cut Command",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3424,
+        2688
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Download Transcript').item.json.content }}",
+        "options": {
+          "systemMessage": "={{ $('Variables').item.json.prompt_in_use[0] }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        2672
+      ],
+      "id": "1c24f0ba-99cc-4f2f-b5b9-97136ed6e8ab",
+      "name": "Clip Identifier"
+    },
+    {
+      "parameters": {
+        "content": "## Create Clips",
+        "height": 380,
+        "width": 3432
+      },
+      "id": "be8812f3-4596-4ce8-b7f6-ffbbf9df1aaa",
+      "name": "Pipeline Documentation2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        496,
+        2592
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=PID{{ $json.airtable_rec.VID }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Edit Fields').item.json.webhook_body.brand.GOOGLE_FOLDER_ROOT_ID }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1296,
+        1152
+      ],
+      "id": "7559cc9a-839c-4ffb-a875-fefccf418d4a",
+      "name": "Create Parent Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "rqOZTBH7PEf8E73a",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Webhook').item.json.body.brand.BRAND_KIT }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -816,
+        2576
+      ],
+      "id": "43e7e1c3-6189-46d8-8d68-b87da5156c34",
+      "name": "Get Brand Kit",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "G6iON3SaK1WrsMH3",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Webhook').item.json.body.brand.DESIGN_KIT }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -608,
+        2576
+      ],
+      "id": "526fb1f0-c6d7-4ba2-8e4c-f0ff6ffd273d",
+      "name": "Get Design Kit",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "G6iON3SaK1WrsMH3",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Edit Fields').item.json.airtable_rec['Transcript URL'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1712,
+        1152
+      ],
+      "id": "53752649-aa6d-4397-8678-4b6863ffbb3c",
+      "name": "Get Transcript Text"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "=# {{ $('Bundle Idea').item.json.title }}\n\n**Summary:**  \n{{ $('Bundle Idea').item.json.summary }}\n\n**Supporting Concepts:**  \n{{ $('Bundle Idea').item.json.supporting_concepts }}\n\n**Related Angles:**  \n{{ $('Bundle Idea').item.json.related_angles }}\n\n**Research Questions:**  \n{{ $('Bundle Idea').item.json.research_questions }}\n\n---\n\n**Session Summary:**  \n{{ $('Bundle Idea').item.json.session_summary }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        3056,
+        1152
+      ],
+      "id": "554ba48e-0c42-4a09-8245-df9fca42ccf4",
+      "name": "Update AT Doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "G6iON3SaK1WrsMH3",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Get Transcript Text').item.json.data }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $('Get Prompt Doc').item.json.content }}\n\n{{ $('Get Brand Kit').item.json.content }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        1152
+      ],
+      "id": "476b44df-ea14-48ee-b7de-57a0386147c8",
+      "name": "Transcript Transformer"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3-mini",
+          "mode": "list",
+          "cachedResultName": "o3-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1936,
+        1280
+      ],
+      "id": "78dc2c73-dc2b-4154-87e7-5df9f1e78abf",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "AGI4Iybca9Zzbg7q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "\n{\n  \"session_summary\": \"This brainstorm centered on...\",\n  \"ideas\": [\n    {\n      \"title\": \"AI for Coaches: Repurpose, Don’t Write\",\n    \"summary\": \"Shows how coaches can use AI to repurpose transcripts into social posts instead of generating content from scratch.\",\n    \"supporting_concepts\": [\n      \"Transcripts are more authentic than AI-first drafts\",\n      \"AI is better at summarizing than inventing\",\n      \"Coaches regain time by focusing on core message\"\n    ],\n    \"related_angles\": [\n      \"Contrarian: AI should never start with a blank page\",\n      \"Use-case: Instagram carousels from coaching Zoom calls\",\n      \"Objection: ‘It’ll sound robotic’ — fix with transcript tone\"\n    ],\n    \"research_questions\": [\n      \"What content types repurpose best?\",\n      \"How accurate is AI when summarizing coaching calls?\",\n      \"What prompts capture tone without sounding fake?\"\n    ]\n    }\n  ]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2192,
+        1264
+      ],
+      "id": "fcea38c1-b2b4-4fb6-ab7a-27503b74512e",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "folderId": "={{ $('Create Parent Folder').item.json.id }}",
+        "title": "=CID{{ $json.fields.CID }} {{ $('Bundle Idea').item.json.title }} [IDEA]"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        2784,
+        1152
+      ],
+      "id": "ce63dd9a-1c82-4451-adbd-ad01238d3ed3",
+      "name": "Create Ideas Doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "G6iON3SaK1WrsMH3",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "={{ $('Edit Fields').item.json.webhook_body.variables.BASE_ID }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Edit Fields').item.json.webhook_body.variables.CONTENT_TABLE }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Description": "={{ $('Bundle Idea').item.json.title }}",
+            "Parent Video": "={{[ $('Get a record').item.json.id ]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "CID",
+              "displayName": "CID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Publish Date",
+              "displayName": "Publish Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Percolating",
+                  "value": "Percolating"
+                },
+                {
+                  "name": "Planning",
+                  "value": "Planning"
+                },
+                {
+                  "name": "Create",
+                  "value": "Create"
+                },
+                {
+                  "name": "Needs Review",
+                  "value": "Needs Review"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Archive",
+                  "value": "Archive"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Action",
+              "displayName": "Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Text Document",
+              "displayName": "Text Document",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "📥 Image",
+              "displayName": "📥 Image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "📥 Video",
+              "displayName": "📥 Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Folder",
+              "displayName": "Folder",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Content Type",
+              "displayName": "Content Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Idea",
+                  "value": "Idea"
+                },
+                {
+                  "name": "Article",
+                  "value": "Article"
+                },
+                {
+                  "name": "Email",
+                  "value": "Email"
+                },
+                {
+                  "name": "Post",
+                  "value": "Post"
+                },
+                {
+                  "name": "Quote",
+                  "value": "Quote"
+                },
+                {
+                  "name": "Coaching Calls",
+                  "value": "Coaching Calls"
+                },
+                {
+                  "name": "VIdeo",
+                  "value": "VIdeo"
+                },
+                {
+                  "name": "Clips",
+                  "value": "Clips"
+                },
+                {
+                  "name": "Image",
+                  "value": "Image"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "AUTO_ID",
+              "displayName": "AUTO_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "AUTO_ID (from Action)",
+              "displayName": "AUTO_ID (from Action)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Text URL",
+              "displayName": "Text URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Folder URL",
+              "displayName": "Folder URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Rate",
+              "displayName": "Rate",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Initialized",
+              "displayName": "Initialized",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Last Modified",
+              "displayName": "Last Modified",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Doc ID",
+              "displayName": "Doc ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Publish URL",
+              "displayName": "Publish URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Published",
+              "displayName": "Published",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Parent Video",
+              "displayName": "Parent Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Folder ID",
+              "displayName": "Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Brands",
+              "displayName": "Brands",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "SRT URL (from Original Idea)",
+              "displayName": "SRT URL (from Original Idea)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Video URL (from Original Idea)",
+              "displayName": "Video URL (from Original Idea)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "🟡 Webhook URL (from Action)",
+              "displayName": "🟡 Webhook URL (from Action)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Parent Idea",
+              "displayName": "Parent Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "From field: Parent Idea",
+              "displayName": "From field: Parent Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID (from Brands)",
+              "displayName": "Record ID (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Last Job ID",
+              "displayName": "Last Job ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Videos",
+              "displayName": "Videos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID (from Brands) 2",
+              "displayName": "Record ID (from Brands) 2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Prompts Doc (from Brands)",
+              "displayName": "Prompts Doc (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Design Kit (from Brands)",
+              "displayName": "Design Kit (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Brand Kit (from Brands)",
+              "displayName": "Brand Kit (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Google Folder Root ID (from Brands)",
+              "displayName": "Google Folder Root ID (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Name (from Brands)",
+              "displayName": "Name (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2576,
+        1152
+      ],
+      "id": "c22f192b-33f0-4a5b-b858-041a25d840b0",
+      "name": "Create Ideas Record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OvFMKmqxDW8MPXe4",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const { session_id, session_summary, ideas } = items[0].json.output;\n\nreturn ideas.map(idea => ({\n  json: {\n    ...idea,\n    session_id,\n    session_summary\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        1152
+      ],
+      "id": "2f7c7ece-51ae-4071-8c4a-8675baa0031a",
+      "name": "Bundle Idea"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        736,
+        2240
+      ],
+      "id": "8fc9e4fc-39d0-4c68-9dbb-9aab28efc31c",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "AGI4Iybca9Zzbg7q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={CONTENT}=\n{{ $json.airtable_rec.Description }}\n\n{{ $json.content_doc }}\n\n{BRAND_KIT_XML}={{ $('Get Brand Kit').item.json.content }}\n\n{DESIGN_KIT_XML}={{ $('Get Design Kit').item.json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $json.selected_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        768,
+        2000
+      ],
+      "id": "a680988b-3e46-49e2-a4e1-d3c7952cb3b7",
+      "name": "AI Image Prompt Designer"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "model": "gpt-image-1",
+        "prompt": "={{ $json.prompt }}",
+        "options": {
+          "quality": "high"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1504,
+        2000
+      ],
+      "id": "7d656ea4-e763-47db-9e31-49375e5277a3",
+      "name": "Create Image",
+      "executeOnce": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "AGI4Iybca9Zzbg7q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"session_id\": {\n      \"type\": \"string\"\n    },\n    \"created_at\": {\n      \"type\": \"string\"\n    },\n    \"contents\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"content1\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"type\": {\n              \"type\": \"string\",\n              \"const\": \"image_prompts\"\n            },\n            \"payload\": {\n              \"type\": \"array\",\n              \"items\": {\n                \"type\": \"object\",\n                \"properties\": {\n                  \"style_name\": {\n                    \"type\": \"string\"\n                  },\n                  \"prompt\": {\n                    \"type\": \"string\"\n                  }\n                },\n                \"required\": [\"style_name\", \"prompt\"]\n              },\n              \"minItems\": 1\n            }\n          },\n          \"required\": [\"type\", \"payload\"]\n        }\n      },\n      \"required\": [\"content1\"]\n    }\n  },\n  \"required\": [\"session_id\", \"created_at\", \"contents\"]\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        2224
+      ],
+      "id": "c009aabd-a3b5-4c73-ab4f-9f0b880b2373",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Webhook').item.json.body.brand.PROMPTS_DOC }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        2576
+      ],
+      "id": "8bb66483-3b01-472d-aecb-d9c8f6d22895",
+      "name": "Get Prompt Doc",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "G6iON3SaK1WrsMH3",
+          "name": "Google Docs account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the webhook data and prompt document content from previous nodes\nconst webhookData = $('Webhook').item.json.body;\nconst promptDocContent = $input.item.json.content;\n\n// Get the parent record data from the \"Get a record\" node  \nlet parentData = null;\ntry {\n  parentData = $('Get a record').item.json;\n  \n  if (!parentData || !parentData.id) {\n    const possibleNodes = ['Get a Record', 'Get Parent Record', 'Get Video Record', 'Airtable'];\n    for (const nodeName of possibleNodes) {\n      try {\n        const nodeData = $(nodeName).item.json;\n        if (nodeData && nodeData.id) {\n          parentData = nodeData;\n          break;\n        }\n      } catch (e) {\n        // Continue to next possible node\n      }\n    }\n  }\n} catch (error) {\n  console.log('Could not access parent record data:', error.message);\n}\n\n// Get Content Doc data\nlet contentDocData = null;\nlet contentDocError = false;\ntry {\n  contentDocData = $('Get Content Doc').item.json;\n  // Check if Content Doc returned an error\n  if (contentDocData && (contentDocData.error || contentDocData.message)) {\n    contentDocError = true;\n  }\n} catch (error) {\n  contentDocError = true;\n  console.log('Could not access Content Doc data:', error.message);\n}\n\n// Get Transcript Doc data (for S records)\nlet transcriptDocData = null;\nlet transcriptDocError = false;\ntry {\n  transcriptDocData = $('Download VTT').item.json;\n  // Check if Transcript Doc returned an error\n  if (transcriptDocData && (transcriptDocData.error || transcriptDocData.message)) {\n    transcriptDocError = true;\n  }\n} catch (error) {\n  transcriptDocError = true;\n  console.log('Could not access Transcript Doc data:', error.message);\n}\n\n// Get AUTO_ID from webhook data\nconst autoId = webhookData.action.AUTO_ID;\n\n// CRITICAL: Determine content based on ID field\nlet contentVariable = '';\nif (parentData && parentData.ID) {\n  const recordId = parentData.ID.toString();\n  \n  if (recordId.startsWith('C')) {\n    // Content record: Description + Content Doc (unless Content Doc errored)\n    contentVariable = parentData.Description || '';\n    \n    if (!contentDocError && contentDocData && contentDocData.content) {\n      contentVariable += '\\n\\n' + contentDocData.content;\n    }\n    \n  } else if (recordId.startsWith('L')) {\n    // Learning record: Content Doc only\n    if (!contentDocError && contentDocData && contentDocData.content) {\n      contentVariable = contentDocData.content;\n    } else {\n      contentVariable = 'ERROR: Could not retrieve Content Doc for Learning record';\n    }\n    \n  } else if (recordId.startsWith('S')) {\n    // Session record: Transcript from downloaded VTT file using Doc ID\n    if (!transcriptDocError && transcriptDocData && transcriptDocData.content) {\n      contentVariable = transcriptDocData.content;\n    } else {\n      contentVariable = 'ERROR: Could not retrieve Transcript Doc for Session record';\n    }\n    \n  } else {\n    contentVariable = 'ERROR: Unknown record type - ID does not start with C, L, or S';\n  }\n} else {\n  contentVariable = 'ERROR: Could not determine record ID';\n}\n\n// Clean up the prompt document content and handle multiple separator types\nlet cleanedPromptContent = promptDocContent.trim();\n\ntry {\n  // Split by both newlines AND vertical tab characters (\\u000b)\n  const lines = cleanedPromptContent\n    .split(/[\\n\\u000b]+/)  // Split on newlines OR vertical tabs (one or more)\n    .filter(line => line.trim() !== '');\n  \n  const prompts = [];\n  \n  for (const line of lines) {\n    try {\n      const promptObj = JSON.parse(line.trim());\n      prompts.push(promptObj);\n    } catch (lineError) {\n      console.log(`Skipped invalid JSON line: ${line.substring(0, 50)}...`);\n    }\n  }\n  \n  // DETERMINE PROMPTS TO USE\n  let promptsInUse = [];\n  let isMultiPrompt = false;\n  let jobRole = '';\n  let contentType = '';\n  let promptTitle = '';\n  \n  if (autoId == 18) {\n    // SPECIAL CASE: AUTO_ID = 18 means return ALL copywriter prompts\n    const copywriterPrompts = prompts.filter(p => p.job_role === \"copywriter\");\n    \n    if (copywriterPrompts.length === 0) {\n      return [{ \n        json: { \n          error: \"No copywriter prompts found\",\n          total_prompts_found: prompts.length,\n          webhook_body: webhookData,\n          airtable_record: parentData || {},\n          content: contentVariable\n        } \n      }];\n    }\n    \n    promptsInUse = copywriterPrompts;\n    isMultiPrompt = true;\n    jobRole = \"copywriter\";\n    contentType = \"multiple\";\n    promptTitle = \"All Copywriter Prompts\";\n    \n  } else {\n    // Normal case: Find the matching prompt by AUTO_ID\n    const selectedPrompt = prompts.find(p => p.id == autoId);\n    \n    if (!selectedPrompt) {\n      return [{ \n        json: { \n          error: `No prompt found with ID ${autoId}`,\n          available_ids: prompts.map(p => p.id),\n          total_prompts_found: prompts.length,\n          webhook_body: webhookData,\n          airtable_record: parentData || {},\n          content: contentVariable,\n          record_id: parentData?.ID || 'UNKNOWN',\n          content_source: parentData?.ID ? `Determined by ID: ${parentData.ID}` : 'Could not determine'\n        } \n      }];\n    }\n    \n    promptsInUse = [selectedPrompt];\n    isMultiPrompt = false;\n    jobRole = selectedPrompt.job_role;\n    contentType = selectedPrompt.content_type;\n    promptTitle = selectedPrompt.title;\n  }\n  \n  // Return the unified structure\n  return [{ \n    json: { \n      // SINGLE UNIFIED VARIABLE - always an array of prompt objects\n      prompt_in_use: promptsInUse,\n      \n      // Metadata about the prompts\n      job_role: jobRole,\n      content_type: contentType,\n      prompt_title: promptTitle,\n      auto_id: autoId,\n      total_prompts_available: prompts.length,\n      prompts_count: promptsInUse.length,\n      is_multi_prompt: isMultiPrompt,\n      \n      // Include webhook data for access throughout workflow\n      webhook_body: webhookData,\n      \n      // Include complete parent record data\n      airtable_record: parentData || {},\n      \n      // CRITICAL: The content variable with proper logic\n      content: contentVariable,\n      \n      // Debug info\n      record_id: parentData?.ID || 'UNKNOWN',\n      content_source: parentData?.ID ? `Determined by ID: ${parentData.ID}` : 'Could not determine',\n      content_doc_error: contentDocError,\n      transcript_doc_error: transcriptDocError\n    } \n  }];\n  \n} catch (error) {\n  return [{ \n    json: { \n      error: `Failed to parse JSONL: ${error.message}`,\n      rawContent: promptDocContent.substring(0, 200) + \"...\",\n      webhook_body: webhookData,\n      airtable_record: parentData || {},\n      content: contentVariable,\n      record_id: parentData?.ID || 'UNKNOWN',\n      content_source: parentData?.ID ? `Determined by ID: ${parentData.ID}` : 'Could not determine'\n    } \n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        2576
+      ],
+      "id": "f21754d0-0b04-412a-84ab-938417c3d104",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "value": "={{ $('Variables').item.json.webhook_body.variables.BASE_ID }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Variables').item.json.webhook_body.variables.CLIPS_TABLE }}",
+          "mode": "id"
+        },
+        "id": "={{ $json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3104,
+        2672
+      ],
+      "id": "a956d3ed-dc89-4a18-b2d7-9b889fae5032",
+      "name": "Get Updated Clip Record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OvFMKmqxDW8MPXe4",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1792,
+        2800
+      ],
+      "id": "45a08a63-b78c-47f2-a9f3-eeb217c4220f",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "AGI4Iybca9Zzbg7q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "020e0e1c-aece-4251-b062-ebded1f36f82",
+              "name": "webhook_body",
+              "value": "={{ $('Webhook').item.json.body }}",
+              "type": "object"
+            },
+            {
+              "id": "de6c1719-497a-4336-a0a2-cdca3ad1c4bc",
+              "name": "parent_record",
+              "value": "={{ $('Get a record').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "111be266-c6b4-4849-af13-4c326dcc45df",
+              "name": "designkit",
+              "value": "={{ $('Get Design Kit').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "37346067-e5d1-4b35-bd67-15ec488098b3",
+              "name": "brandkit",
+              "value": "={{ $('Get Brand Kit').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "0a811574-b9f3-40fd-be1e-3cd2b6a9b320",
+              "name": "prompt_in_use",
+              "value": "={{ $json.prompt_in_use }}",
+              "type": "array"
+            },
+            {
+              "id": "677f7363-7613-4291-af89-3431996bb90d",
+              "name": "content_doc",
+              "value": "={{ $('Get Content Doc').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "d9e913ee-96fc-4926-8f14-140b6de8140b",
+              "name": "job_role",
+              "value": "={{ $json.webhook_body.action.JOB_ROLE[0].name }}",
+              "type": "string"
+            },
+            {
+              "id": "ea303352-c580-4eb0-97a8-566157b7f72d",
+              "name": "action_auto_id",
+              "value": "={{ $json.webhook_body.action.AUTO_ID }}",
+              "type": "number"
+            },
+            {
+              "id": "13d1cf83-2532-47cc-b0b1-8d438f2d39e2",
+              "name": "airtable_record",
+              "value": "={{ $json.airtable_record }}",
+              "type": "object"
+            },
+            {
+              "id": "968c94ea-efc1-4304-91f7-12ab16555127",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        2576
+      ],
+      "id": "39d257e2-7923-4b73-ba55-25634a0860f5",
+      "name": "Variables",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.contents.content1.payload",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        2000
+      ],
+      "id": "32c75a76-a2d1-4b27-b8c7-bc06e09097b7",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2080,
+        2176
+      ],
+      "id": "8f395783-36c3-4f4a-8a49-538cae4b67e0",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "value": "={{ $json.body.variables.BASE_ID }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $json.body.variables.VIDEO_TABLE }}",
+          "mode": "id"
+        },
+        "id": "={{ $('Webhook').item.json.body.recordId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -1168,
+        2576
+      ],
+      "id": "693a7594-97e0-42fd-b202-98e27c41cd58",
+      "name": "Get a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OvFMKmqxDW8MPXe4",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "={{ $('Edit Fields').item.json.webhook_body.variables.BASE_ID }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Edit Fields').item.json.webhook_body.variables.CONTENT_TABLE }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Create Ideas Record').item.json.id }}",
+            "Content Type": "Idea",
+            "Status": "Percolating",
+            "Folder URL": "=https://drive.google.com/drive/u/1/folders/{{ $('Create Parent Folder').item.json.id }}",
+            "Text URL": "=https://docs.google.com/document/d/{{ $('Create Ideas Doc').item.json.id }}",
+            "Brands": "={{ [$('Edit Fields').item.json.webhook_body.brand.RECORD_ID] }}",
+            "Parent Video": "={{ [$('Code1').item.json.webhook_body.recordId] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "CID",
+              "displayName": "CID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Publish Date",
+              "displayName": "Publish Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Percolating",
+                  "value": "Percolating"
+                },
+                {
+                  "name": "Planning",
+                  "value": "Planning"
+                },
+                {
+                  "name": "Create",
+                  "value": "Create"
+                },
+                {
+                  "name": "Needs Review",
+                  "value": "Needs Review"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Archive",
+                  "value": "Archive"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Action",
+              "displayName": "Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Text Document",
+              "displayName": "Text Document",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "📥 Image",
+              "displayName": "📥 Image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "📥 Video",
+              "displayName": "📥 Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Folder",
+              "displayName": "Folder",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Content Type",
+              "displayName": "Content Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Idea",
+                  "value": "Idea"
+                },
+                {
+                  "name": "Article",
+                  "value": "Article"
+                },
+                {
+                  "name": "Email",
+                  "value": "Email"
+                },
+                {
+                  "name": "Post",
+                  "value": "Post"
+                },
+                {
+                  "name": "Quote",
+                  "value": "Quote"
+                },
+                {
+                  "name": "Coaching Calls",
+                  "value": "Coaching Calls"
+                },
+                {
+                  "name": "VIdeo",
+                  "value": "VIdeo"
+                },
+                {
+                  "name": "Clips",
+                  "value": "Clips"
+                },
+                {
+                  "name": "Image",
+                  "value": "Image"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AUTO_ID",
+              "displayName": "AUTO_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "AUTO_ID (from Action)",
+              "displayName": "AUTO_ID (from Action)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Text URL",
+              "displayName": "Text URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Folder URL",
+              "displayName": "Folder URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Rate",
+              "displayName": "Rate",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Initialized",
+              "displayName": "Initialized",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Last Modified",
+              "displayName": "Last Modified",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Doc ID",
+              "displayName": "Doc ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Publish URL",
+              "displayName": "Publish URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Published",
+              "displayName": "Published",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Parent Video",
+              "displayName": "Parent Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Folder ID",
+              "displayName": "Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Brands",
+              "displayName": "Brands",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "SRT URL (from Original Idea)",
+              "displayName": "SRT URL (from Original Idea)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Video URL (from Original Idea)",
+              "displayName": "Video URL (from Original Idea)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "🟡 Webhook URL (from Action)",
+              "displayName": "🟡 Webhook URL (from Action)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Parent Idea",
+              "displayName": "Parent Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "From field: Parent Idea",
+              "displayName": "From field: Parent Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID (from Brands)",
+              "displayName": "Record ID (from Brands)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Last Job ID",
+              "displayName": "Last Job ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3248,
+        1152
+      ],
+      "id": "dd19eef1-a2ad-477b-a5d2-26c3611ff10f",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OvFMKmqxDW8MPXe4",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1968,
+        1920
+      ],
+      "id": "ca784b89-2574-4d15-9458-ae54639b8cc6",
+      "name": "Share file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "rqOZTBH7PEf8E73a",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://nca.everydaycreator.org/v1/ffmpeg/compose",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.ffmpegPayload) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3680,
+        2688
+      ],
+      "id": "21828f32-6a71-4bd5-b0b0-42e50688db95",
+      "name": "Cut Clips API",
+      "executeOnce": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JMY53dTaSMmX8vtJ",
+          "name": "NCA Toolkit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Please review and refine this video clip for optimal engagement and brand alignment:\nOriginal Clip Data:\n\nClip Number: {{ $json.clip_number }}\nCurrent Description: {{ $json.description }}\nStart Time: {{ $json.startTime }} seconds\nEnd Time: {{ $json.endTime }} seconds\nDuration: {{ Math.round($json.endTime - $json.startTime) }} seconds\n\nTranscript Content:\n{{ $json.full_transcript }}\nSRT Timing Reference:\n{{ $json.srt_segment }}\nContext: This clip was extracted from a longer coaching/educational video and needs to be optimized as a standalone social media content piece. Focus on adjusting ONLY the start and end times—do not modify the transcript content itself. Ensure the first 1-3 sentences of the resulting clip (based on your timing adjustments) create an immediate hook that stops viewers from scrolling. Maximum duration is 85 seconds.\nPlease provide your refined timing, enhanced description, and quality assessment as a JSON object following the exact format specified in your instructions. Return ONLY the JSON - no additional formatting or explanation.",
+        "options": {
+          "systemMessage": "=**Context:** You are a master video clip editor and content strategist operating within an automated content creation pipeline. You receive preliminary clips that have been identified from longer-form videos and assigned initial timing boundaries. Your role is to refine these clips into polished, standalone content pieces optimized for social media engagement and brand consistency.\n\n**Role:** You are an expert video editor with over two decades of experience in content optimization, social media strategy, and brand-aligned storytelling. You excel at identifying the precise moments that create maximum emotional impact, ensuring narrative completeness, and optimizing timing for platform-specific requirements. Your expertise includes understanding speech patterns, emotional peaks, setup-payoff structures, and the psychology of viewer engagement.\n\n**Action:** For each clip you receive, execute these sequential steps:\n\n1. **Analyze Content Quality:** Review the transcript segment for narrative completeness, emotional arc, and standalone value. Ensure the clip delivers a complete thought or insight that provides value without requiring additional context.\n\n2. **Optimize Timing Boundaries:** Refine start and end times by analyzing the transcript to ensure the clip begins with a compelling hook (first 1-3 sentences should grab attention immediately). DO NOT edit the transcript content itself—only adjust start_time and end_time values to capture the most engaging portion. Focus on natural speech entry points, removing dead air or filler from the beginning, and ensuring the opening lines create immediate viewer interest.\n\n3. **Validate Opening Hook:** Confirm that the first 1-3 sentences of the transcript segment (based on your timing adjustments) serve as compelling hooks that would make viewers stop scrolling. The opening must deliver immediate value or intrigue without requiring setup.\n\n4. **Enhance Descriptions:** Improve clip descriptions to be compelling, accurate, and platform-optimized. Create descriptions that would make someone stop scrolling and engage with the content.\n\n5. **Validate Technical Requirements:** Ensure clips meet optimal duration ranges (maximum 85 seconds), maintain audio quality consistency, and preserve the speaker's natural delivery style.\n\n6. **Apply Brand Alignment:** Consider the pragmatic, tech-savvy, empowering brand voice. Ensure clips align with the \"AI for coaches and creators\" positioning and deliver immediately actionable value.\n\n**Format:** Return your analysis and recommendations as a valid JSON object with this exact structure:\n```json\n{\n  \"start_time\": [refined start time in seconds as number],\n  \"end_time\": [refined end time in seconds as number], \n  \"timing_reasoning\": \"[brief explanation for timing changes]\",\n  \"enhanced_description\": \"[improved clip description]\",\n  \"hook_assessment\": \"[evaluation of opening sentences as hooks]\",\n  \"duration_seconds\": [calculated duration as number],\n  \"technical_notes\": \"[audio, pacing, and quality observations]\"\n}\nCRITICAL: Return ONLY the JSON object. No markdown formatting, no additional text, no explanations outside the JSON.\nTarget Audience: AI-curious coaches, creators, and agency owners who value practical, immediately useful insights over theoretical concepts. Optimize for viewers who prefer depth over virality and actionable content over entertainment."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        2672
+      ],
+      "id": "7d8fe231-6def-4bf8-9174-be98f6278e6a",
+      "name": "Clip Editor"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get AI editor recommendations (array of outputs) and ALL clip data\nconst editorOutputs = $('Clip Editor').all(); // Get ALL editor outputs\nconst allClips = $('Process Clip Timing').all(); // Get ALL clips\n\nconsole.log(`Processing ${allClips.length} clips with ${editorOutputs.length} editor outputs`);\n\n// Try to get SRT content from various sources\nlet srtContent = null;\n\n// First, try to get it from the workflow's Variables node if available\ntry {\n    const variablesNode = $('Variables');\n    if (variablesNode && variablesNode.first() && variablesNode.first().json.srt_content) {\n        srtContent = variablesNode.first().json.srt_content;\n    }\n} catch (error) {\n    console.log('Could not access SRT from Variables node:', error.message);\n}\n\n// If not found in Variables, try to get from Download VTT node using .first() instead of .item\nif (!srtContent) {\n    try {\n        const downloadVttNode = $('Download VTT');\n        if (downloadVttNode && downloadVttNode.first() && downloadVttNode.first().json.data) {\n            srtContent = downloadVttNode.first().json.data;\n        }\n    } catch (error) {\n        console.log('Could not access SRT from Download VTT node:', error.message);\n    }\n}\n\n// If still not found, try from Extract from File node\nif (!srtContent) {\n    try {\n        const extractNode = $('Extract from File');\n        if (extractNode && extractNode.first() && extractNode.first().json.vtt_content) {\n            srtContent = extractNode.first().json.vtt_content;\n        }\n    } catch (error) {\n        console.log('Could not access SRT from Extract from File node:', error.message);\n    }\n}\n\n// If we still don't have SRT content, return an error\nif (!srtContent || typeof srtContent !== 'string') {\n    return [{ \n        json: { \n            error: 'No SRT content found or invalid format',\n            debug: {\n                srt_content_type: typeof srtContent,\n                srt_content_length: srtContent ? srtContent.length : 0,\n                available_nodes: Object.keys($workflow).filter(key => key !== 'itemIndex'),\n                clips_available: allClips.length,\n                editor_outputs_available: editorOutputs.length\n            }\n        },\n        pairedItem: { item: 0 } // Add pairedItem reference for error case\n    }];\n}\n\n// Helper functions\nconst timeToSeconds = (time) => {\n    const parts = time.replace(',', '.').split(':');\n    return parseFloat(parts[0]) * 3600 + parseFloat(parts[1]) * 60 + parseFloat(parts[2]);\n};\n\n// Parse SRT blocks with precise timing\nconst srtBlocks = [];\nconst srtRegex = /(\\d+)\\s*\\n\\s*(\\d{2}:\\d{2}:\\d{2}[,.]?\\d{3})\\s*-->\\s*(\\d{2}:\\d{2}:\\d{2}[,.]?\\d{3})\\s*\\n([\\s\\S]*?)(?=\\n\\n|\\n$|$)/g;\nlet match;\nwhile ((match = srtRegex.exec(srtContent)) !== null) {\n    const startSeconds = timeToSeconds(match[2]);\n    const endSeconds = timeToSeconds(match[3]);\n    srtBlocks.push({\n        num: parseInt(match[1]),\n        startTime: match[2],\n        endTime: match[3],\n        startSeconds: startSeconds,\n        endSeconds: endSeconds,\n        duration: endSeconds - startSeconds,\n        text: match[4].trim()\n    });\n}\n\nconsole.log(`Parsed ${srtBlocks.length} SRT blocks`);\n\nconst processedClips = [];\n\n// Process ALL clips individually - USE AI EDITOR TIMING, just get SRT segments\nfor (let i = 0; i < Math.min(allClips.length, editorOutputs.length); i++) {\n    try {\n        const originalClip = allClips[i].json;\n        \n        // Parse the AI editor recommendation - handle both string and object formats\n        let editorRecommendation;\n        try {\n            if (typeof editorOutputs[i].json.output === 'string') {\n                editorRecommendation = JSON.parse(editorOutputs[i].json.output);\n            } else {\n                editorRecommendation = editorOutputs[i].json.output;\n            }\n        } catch (parseError) {\n            console.error(`Error parsing editor recommendation for clip ${i + 1}:`, parseError.message);\n            // Use fallback values if parsing fails\n            editorRecommendation = {\n                enhanced_description: originalClip.description || `Clip ${i + 1}`,\n                hook_assessment: 'Analysis not available',\n                timing_reasoning: 'Timing analysis not available',\n                technical_notes: 'Technical notes not available',\n                start_time: originalClip.startTime || 0,\n                end_time: originalClip.endTime || 30\n            };\n        }\n        \n        console.log(`Processing clip ${i + 1}: ${originalClip.description.substring(0, 50)}...`);\n        \n        // TRUST THE AI EDITOR'S TIMING - don't recalculate from SRT matching\n        const startTime = editorRecommendation.start_time || originalClip.startTime || 0;\n        const endTime = editorRecommendation.end_time || originalClip.endTime || 30;\n        \n        console.log(`Clip ${i + 1} using AI editor timing: ${startTime} - ${endTime} seconds`);\n        \n        // Find SRT blocks that overlap with the AI editor's timing\n        const relevantBlocks = srtBlocks.filter(block => {\n            // Include blocks that overlap with the clip timing\n            return (block.startSeconds < endTime && block.endSeconds > startTime);\n        });\n        \n        console.log(`Found ${relevantBlocks.length} SRT blocks for clip ${i + 1}`);\n        \n        // Generate SRT segment from overlapping blocks\n        let srtSegment = '';\n        if (relevantBlocks.length > 0) {\n            srtSegment = relevantBlocks.map(b => \n                `${b.num}\\n${b.startTime} --> ${b.endTime}\\n${b.text}`\n            ).join('\\n\\n');\n        }\n\n        // Add processed clip to results\n        processedClips.push({\n            json: {\n                // Keep original clip structure but update with AI editor enhancements\n                clip_number: originalClip.clip_number,\n                description: editorRecommendation.enhanced_description,\n                full_transcript: originalClip.full_transcript,\n                // USE AI EDITOR'S TIMING DIRECTLY\n                startTime: startTime,\n                endTime: endTime,\n                duration: endTime - startTime,\n                // SRT segment from overlapping blocks\n                srt_segment: srtSegment,\n                startBlock: relevantBlocks.length > 0 ? relevantBlocks[0].num : null,\n                endBlock: relevantBlocks.length > 0 ? relevantBlocks[relevantBlocks.length - 1].num : null,\n                blockCount: relevantBlocks.length,\n                // Add AI editor analysis fields\n                analysis: editorRecommendation.hook_assessment,\n                enhancedDescription: editorRecommendation.enhanced_description,\n                timing_reasoning: editorRecommendation.timing_reasoning,\n                technical_notes: editorRecommendation.technical_notes,\n                // Airtable-ready fields\n                clip_title: editorRecommendation.enhanced_description,\n                clip_duration: Math.round(endTime - startTime)\n            },\n            // CRITICAL: Add pairedItem to maintain n8n item relationships\n            pairedItem: { item: i }\n        });\n        \n        console.log(`Successfully processed clip ${i + 1} with duration ${endTime - startTime} seconds`);\n        \n    } catch (error) {\n        console.error(`Error processing clip ${i + 1}:`, error.message);\n        console.error(`Error stack:`, error.stack);\n        continue;\n    }\n}\n\nconsole.log(`Returning ${processedClips.length} processed clips`);\nreturn processedClips;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2672,
+        2672
+      ],
+      "id": "be1f95bc-ec3c-4dde-8ca1-c10494747537",
+      "name": "Apply Timing Adjustments"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2304,
+        2784
+      ],
+      "id": "de36a62c-07cb-4745-959b-2f25733b7247",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "AGI4Iybca9Zzbg7q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "={{ $('Variables').item.json.webhook_body.variables.BASE_ID }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Variables').item.json.webhook_body.variables.CLIPS_TABLE }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Clip Description": "={{ $json.description }}",
+            "Transcript": "={{ $json.full_transcript }}",
+            "SRT": "={{ $('Variables').item.json.airtable_record['SRT URL'] }}",
+            "Start Time": "={{ $json.startTime }}",
+            "End Time": "={{ $json.endTime }}",
+            "Parent AV": "={{ [$('Variables').item.json.webhook_body.recordId] }}",
+            "Brand": "={{ [ $('Variables').item.json.webhook_body.brand.RECORD_ID ] }}",
+            "Analysis": "={{ $json.analysis }}\n\n{{ $json.timing_reasoning }}\n\n{{ $json.technical_notes }}",
+            "Folder URL": "=https://drive.google.com/drive/u/1/folders/{{ $('Variables').item.json.airtable_record['Folder ID'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "AUTO_ID",
+              "displayName": "AUTO_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Description (from Coaching Call)",
+              "displayName": "Description (from Coaching Call)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Clip Description",
+              "displayName": "Clip Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Transcript",
+              "displayName": "Transcript",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Actions",
+              "displayName": "Actions",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Cropped Clip",
+              "displayName": "Cropped Clip",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Clip URL",
+              "displayName": "Clip URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Clip Type",
+              "displayName": "Clip Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "screenshare",
+                  "value": "screenshare"
+                },
+                {
+                  "name": "talking_head",
+                  "value": "talking_head"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "SRT",
+              "displayName": "SRT",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Start Time",
+              "displayName": "Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "End Time",
+              "displayName": "End Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Duration",
+              "displayName": "Duration",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Thumbnail URL",
+              "displayName": "Thumbnail URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Crop x-Width",
+              "displayName": "Crop x-Width",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Crop y-Height",
+              "displayName": "Crop y-Height",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Center x-Width",
+              "displayName": "Center x-Width",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Center y-Height",
+              "displayName": "Center y-Height",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Clip Left x-Width",
+              "displayName": "Clip Left x-Width",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Clip Top y-Height",
+              "displayName": "Clip Top y-Height",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Final Clip (watch me)",
+              "displayName": "Final Clip (watch me)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Callback/Update Webhook URL (from Actions)",
+              "displayName": "Callback/Update Webhook URL (from Actions)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Brand",
+              "displayName": "Brand",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "All Videos URL (from Videos)",
+              "displayName": "All Videos URL (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Parent AV",
+              "displayName": "Parent AV",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Video URL (from Videos)",
+              "displayName": "Video URL (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Video Aspect Ratio (from Videos)",
+              "displayName": "Video Aspect Ratio (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Clip Aspect Ratio (from Videos)",
+              "displayName": "Clip Aspect Ratio (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Video x-Width (from Videos)",
+              "displayName": "Video x-Width (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Video y-Height (from Videos)",
+              "displayName": "Video y-Height (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Clip x-Width (from Videos)",
+              "displayName": "Clip x-Width (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Clip y-Height (from Videos)",
+              "displayName": "Clip y-Height (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Webhook URL (from Actions)",
+              "displayName": "Webhook URL (from Actions)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "AUTO_ID (from Actions)",
+              "displayName": "AUTO_ID (from Actions)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Assessed Width",
+              "displayName": "Assessed Width",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Assessed Height",
+              "displayName": "Assessed Height",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Assessed Center x-Width",
+              "displayName": "Assessed Center x-Width",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Assessed  Center y-Height",
+              "displayName": "Assessed  Center y-Height",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID (from Brand)",
+              "displayName": "Record ID (from Brand)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Last Job ID",
+              "displayName": "Last Job ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Clip Style",
+              "displayName": "Clip Style",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Last Modified Time",
+              "displayName": "Last Modified Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Analysis",
+              "displayName": "Analysis",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Parent Folder ID",
+              "displayName": "Parent Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Folder URL",
+              "displayName": "Folder URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Folder ID",
+              "displayName": "Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "31ef6aa9-9cff-4875-9177-b6d5991180a1",
+      "name": "Create Clip Record",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2896,
+        2672
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OvFMKmqxDW8MPXe4",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.job_role }}",
+                    "rightValue": "ideator",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "content-generator-condition"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Content Generator"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.job_role }}",
+                    "rightValue": "copywriter",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "copywriter-condition"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Copywriter"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.job_role }}",
+                    "rightValue": "creative_director",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "creative-director-condition"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Creative Director"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.job_role }}",
+                    "rightValue": "video_editor",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "video-editor-condition"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Video Editor"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ef506793-af10-4995-ba92-9b15d528adc1",
+                    "leftValue": "={{ $json.job_role }}",
+                    "rightValue": "publisher",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Publisher"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.job_role }}",
+                    "rightValue": "analyst",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "analyst-condition"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Analyst"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        144,
+        2528
+      ],
+      "id": "8db8f97a-d2f3-41bb-8762-a45124464b26",
+      "name": "Job Role"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fixed Code2 - Create ONE ITEM per prompt from prompt_in_use array\nconst inputData = $input.first().json;\nconsole.log('Code2 starting...');\nconsole.log('Available prompt_in_use:', inputData.prompt_in_use?.length || 0);\n\n// Get all the prompts from the input data (this works for both single prompt and AUTO_ID=18 cases)\nconst promptsToProcess = inputData.prompt_in_use || [];\n\nif (promptsToProcess.length === 0) {\n  console.error('No prompt_in_use found in input data!');\n  return [{\n    json: {\n      ...inputData,\n      error: 'No prompts available in prompt_in_use',\n      ready_for_copychief: false\n    }\n  }];\n}\n\n// Create one output item for EACH prompt\nconst results = promptsToProcess.map((prompt, index) => {\n  \n  console.log(`Creating output ${index + 1} for prompt: ${prompt.title}`);\n  \n  // Build the full contextualized prompt\n  const contextualizedPrompt = `${prompt.prompt}\n\nBRAND_KIT_XML:\n${inputData.brandkit || inputData.brand_context?.brand_kit || ''}\n\nDESIGN_KIT_XML:\n${inputData.designkit || inputData.brand_context?.design_kit || ''}\n\nSOURCE_CONTENT:\n${inputData.content || ''}\n\nCONTENT_TYPE: ${inputData.content_type || 'Post'}\n\nSOURCE_TYPE: ${inputData.source_type || 'clip'}`;\n  \n  return {\n    json: {\n      // Preserve ALL original data\n      ...inputData,\n      \n      // Current prompt-specific data\n      current_prompt: contextualizedPrompt,\n      prompt_template: prompt,\n      prompt_id: prompt.id,\n      prompt_title: prompt.title,\n      prompt_content_type: prompt.content_type,\n      prompt_job_role: prompt.job_role,\n      \n      // Index tracking\n      prompt_index: index + 1,\n      total_prompts: promptsToProcess.length,\n      \n      // Execution metadata\n      execution_context: {\n        prompt_variation: prompt.title,\n        prompt_type: prompt.content_type,\n        content_source: inputData.source_type || 'unknown',\n        processed_at: new Date().toISOString(),\n        workflow_stage: prompt.job_role || 'unknown',\n        auto_id: inputData.auto_id,\n        is_multi_prompt: promptsToProcess.length > 1\n      },\n      \n      // Ready flag\n      ready_for_copychief: true\n    }\n  };\n});\n\nconsole.log(`Code2 complete: Generated ${results.length} output items`);\nconsole.log('Prompt titles:', promptsToProcess.map(p => p.title));\nconsole.log('Prompt IDs:', promptsToProcess.map(p => p.id));\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        1664
+      ],
+      "id": "b88ef180-6dbc-4320-8e9f-61ac34bc4e56",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "h5OHHTLL6FeOdbCM",
+          "mode": "list",
+          "cachedResultName": "Everyday Copywriter"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "body_variables_BASE_ID": "={{ $('Webhook').item.json.body.variables.BASE_ID }}",
+            "body_variables_CONTENT_TABLE": "={{ $('Webhook').item.json.body.variables.CONTENT_TABLE }}",
+            "id": "={{ $('Get a record').item.json.id }}",
+            "designkit": "={{ $('Variables').item.json.designkit }}",
+            "brandkit": "={{ $('Variables').item.json.brandkit }}",
+            "content": "={{ $('Variables').item.json.content }}",
+            "current_prompt_content_type": "={{ $json.prompt_in_use[0] }}",
+            "Brand": "={{ $('Get a record').item.json.Brand }}",
+            "Job_Role_brandkit": "={{ $('Job Role').item.json.brandkit }}",
+            "Job_Role_content": "={{ $json.job_role }}",
+            "webhook_payload": "={{ JSON.stringify($json.webhook_body) }}"
+          },
+          "matchingColumns": [
+            "body_variables_BASE_ID",
+            "body_variables_CONTENT_TABLE",
+            "",
+            "Description",
+            "content_type",
+            "Brands",
+            "id",
+            "designkit",
+            "brandkit",
+            "content",
+            "selected_prompt",
+            "current_prompt_content_type",
+            "Brand",
+            "Job_Role_brandkit",
+            "Job_Role_content"
+          ],
+          "schema": [
+            {
+              "id": "body_variables_BASE_ID",
+              "displayName": "body_variables_BASE_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "body_variables_CONTENT_TABLE",
+              "displayName": "body_variables_CONTENT_TABLE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "content_type",
+              "displayName": "content_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "designkit",
+              "displayName": "designkit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "brandkit",
+              "displayName": "brandkit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "selected_prompt",
+              "displayName": "selected_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_prompt_content_type",
+              "displayName": "current_prompt_content_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Brand",
+              "displayName": "Brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job_Role_brandkit",
+              "displayName": "Job_Role_brandkit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job_Role_content",
+              "displayName": "Job_Role_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "webhook_payload",
+              "displayName": "webhook_payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        1664
+      ],
+      "name": "Call Everyday Copywriter",
+      "id": "a9ea7d57-87c9-45d8-b604-22d1bb66f0f7",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Variables').item.json.airtable_record['Doc ID'] }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        960,
+        2704
+      ],
+      "id": "86a3224e-5f61-4e89-935b-a9ef5e5f6a18",
+      "name": "Download Transcript",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "G6iON3SaK1WrsMH3",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Copywriter",
+        "height": 280,
+        "width": 660,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        1600
+      ],
+      "typeVersion": 1,
+      "id": "a8be0e68-bcdd-47c8-9923-3298cc44e465",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.airtable_record['SRT URL'] }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        576,
+        2688
+      ],
+      "id": "eb2e764d-c474-45b4-916f-a2d7c9714d99",
+      "name": "Download VTT",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "rqOZTBH7PEf8E73a",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "destinationKey": "vtt_content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        768,
+        2704
+      ],
+      "id": "30d84c3c-2d80-43a2-9824-787feddefa29",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Variables').item.json.airtable_record['Shared screen w/ speaker video gdrive id'] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1184,
+        2688
+      ],
+      "id": "521cc2f1-3a26-46f3-9cba-bd453df5ae43",
+      "name": "Download file",
+      "credentials": {
+        "googleApi": {
+          "id": "dAlqDXSNQgdH8ZiL",
+          "name": "Service Account Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "nca",
+        "fileName": "={{ $('Variables').item.json.airtable_record['Shared screen w/ speaker video gdrive id'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        2672
+      ],
+      "id": "bc3929f4-40f7-4f56-8a4e-1a61da37c26a",
+      "name": "Upload to MinIO S3",
+      "credentials": {
+        "s3": {
+          "id": "BNbSyxpLFFUOHCFu",
+          "name": "MiniO"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.everydaycreator.org",
+            "user-agent": "Mozilla/5.0 (compatible; AirtableScripting; +https://airtable.com/developers/scripting;)",
+            "content-length": "1846",
+            "accept": "*/*",
+            "accept-encoding": "gzip,deflate",
+            "content-type": "application/json",
+            "x-airtable-source": "appS7qip5wnjgQwKL/wflpt9tZ3E81D9mT9",
+            "x-forwarded-for": "52.7.183.191:57424",
+            "x-forwarded-host": "n8n.everydaycreator.org",
+            "x-forwarded-proto": "https",
+            "x-real-ip": "52.7.183.191:57424"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "recordId": "recwxupwslRUPnZyQ",
+            "action": {
+              "ACTION_NAME": "Create Clips",
+              "PROMPT_URL": "https://docs.google.com/document/d/16g9zPWoEEKhOVl1r7gSqTO14TKRsF5xWgTSlYlGxY4U/edit?tab=t.0",
+              "AUTO_ID": 2,
+              "CONTENT": null,
+              "ACTION": "Create Clips [2]",
+              "___ACTIVE": true,
+              "___WEBHOOK_URL": "https://n8n.everydaycreator.org/webhook-test/creator",
+              "JOB_ROLE": [
+                {
+                  "id": "selkjj6t36YQkd9iC",
+                  "name": "video_editor",
+                  "color": "cyanLight2"
+                }
+              ],
+              "CALLBACK_WEBHOOK_URL": "https://hooks.airtable.com/workflows/v1/genericWebhook/appS7qip5wnjgQwKL/wflxRof2g3voGxH0h/wtrMZIZc6CLfEt9bg",
+              "RECORD_ID": "recyV1uNu9PEu6Yfo",
+              "VIDEOS": [
+                {
+                  "id": "recwxupwslRUPnZyQ",
+                  "name": "L30"
+                }
+              ],
+              "CLIPS": null
+            },
+            "brand": {
+              "NAME": "francis.waldecker@gmail.com",
+              "GOOGLE_FOLDER_ROOT_ID": "1ormr2eHeEW3gqwKW8CTFZUG-jHHkoZCa",
+              "BRAND_KIT": "1RrPxvVGuKczy3mELVDyqG2lrsmMfaY6f2zP2QAANZHo\n",
+              "DESIGN_KIT": "1bBp00SlMQ8yJqSpYkqA9NgWksNtqYHaTnUgHoZCvj6Q\n",
+              "PROMPTS_DOC": "1iqUmYxPp_bqFTCRIqVeji5vfo5LkR3o9HrzD_UG-Ak8",
+              "RECORD_ID": "reci9cW5bHd2FSuDG",
+              "BRAND_EMAIL": "francis.waldecker@gmail.com",
+              "CAPTION_FONT": "The Bold Font",
+              "SAVE_PARENT_VIDEO": {
+                "id": "selzi1YzEwH5NLDjB",
+                "name": "True",
+                "color": "blueLight2"
+              }
+            },
+            "variables": {
+              "MODEL_ID": "eleven_multilingual_v2",
+              "MINIO_STORAGE_URL": "https://minio-api.everydaycreator.org/nca/",
+              "VIDEO_TABLE": "tblg75MyQZREAqUKk",
+              "VOICE_ID": "B1S0UIUAf6BKJsaAJ3B1",
+              "HEYGEN_VIDEO_WIDTH": "1280",
+              "CLIPS_TABLE": "tbla7ulgJbex5ePsY",
+              "CONTENT_TABLE": "tblCR8yF9HHQlDij1",
+              "HEYGEN_VIDEO_HEIGHT": "720",
+              "HEYGEN_AVATAR_ID": "60b18e0f08a84a78af8490fa05622cdf",
+              "SIMILARITY_BOOST": "0.65",
+              "N8N_PRODUCTION": "false",
+              "HEYGEN_VOICE_ID": "769409544dd944ed92ac5d1f0f1d1a71",
+              "STABILITY": "0.65",
+              "BASE_ID": "appS7qip5wnjgQwKL",
+              "HEYGEN_CALLBACK_WEBHOOK_URL": "https://hooks.airtable.com/workflows/v1/genericWebhook/appS7qip5wnjgQwKL/wfl6zob2Q0VQM5q6g/wtrGdgNNq5r9NOQkq",
+              "GOOGLE_FOLDER_ROOT_ID": "1hhne5dm3ZSIjl1VstIRJ6UYar5Br_kMA",
+              "STYLE": "0"
+            }
+          },
+          "webhookUrl": "https://n8n.everydaycreator.org/webhook-test/creator",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Google Drive: Upload Quote Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "Update Record [Text To Image]1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive: List B-Roll Videos": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive: Upload Quote Image": {
+      "main": [
+        [
+          {
+            "node": "Google Drive: List B-Roll Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Content Doc": {
+      "main": [
+        [
+          {
+            "node": "Get Brand Kit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Clip Timing": {
+      "main": [
+        [
+          {
+            "node": "Clip Editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Cut Command": {
+      "main": [
+        [
+          {
+            "node": "Cut Clips API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clip Identifier": {
+      "main": [
+        [
+          {
+            "node": "Process Clip Timing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Parent Folder": {
+      "main": [
+        [
+          {
+            "node": "Get Transcript Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Brand Kit": {
+      "main": [
+        [
+          {
+            "node": "Get Design Kit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Design Kit": {
+      "main": [
+        [
+          {
+            "node": "Get Prompt Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Transcript Text": {
+      "main": [
+        [
+          {
+            "node": "Transcript Transformer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update AT Doc": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcript Transformer": {
+      "main": [
+        [
+          {
+            "node": "Bundle Idea",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Transcript Transformer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Transcript Transformer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Ideas Doc": {
+      "main": [
+        [
+          {
+            "node": "Update AT Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Ideas Record": {
+      "main": [
+        [
+          {
+            "node": "Create Ideas Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bundle Idea": {
+      "main": [
+        [
+          {
+            "node": "Create Ideas Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Image Prompt Designer",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Structured Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Image Prompt Designer": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Image": {
+      "main": [
+        [
+          {
+            "node": "Upload to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Image Prompt Designer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Prompt Doc": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Updated Clip Record": {
+      "main": [
+        [
+          {
+            "node": "Build Cut Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Clip Identifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables": {
+      "main": [
+        [
+          {
+            "node": "Job Role",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Create Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Add Image > Article Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a record": {
+      "main": [
+        [
+          {
+            "node": "Get Content Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clip Editor": {
+      "main": [
+        [
+          {
+            "node": "Apply Timing Adjustments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Timing Adjustments": {
+      "main": [
+        [
+          {
+            "node": "Create Clip Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Clip Editor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Clip Record": {
+      "main": [
+        [
+          {
+            "node": "Get Updated Clip Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Role": {
+      "main": [
+        [
+          {
+            "node": "Create Parent Folder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Image Prompt Designer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download VTT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Call Everyday Copywriter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Transcript": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download VTT": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Download Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cut Clips API": {
+      "main": [
+        []
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Upload to MinIO S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to MinIO S3": {
+      "main": [
+        [
+          {
+            "node": "Clip Identifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5a27be71-353d-42af-9c91-bfa98afadcee",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b6feeec6266ce5c242c41c4306324474e994ecb1129cd2b23d76b6746965b634"
+  },
+  "id": "wxW6Sf9KaqawrPPd",
+  "tags": []
+}

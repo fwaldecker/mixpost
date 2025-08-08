@@ -11,16 +11,25 @@ use Illuminate\Support\Str;
 use Inovector\Mixpost\Collection\ServiceCollection;
 use Inovector\Mixpost\Exceptions\ServiceNotRegistered;
 use Inovector\Mixpost\Models\Service as ServiceModel;
+use Inovector\Mixpost\Services\Bluesky\BlueskyService;
 use Inovector\Mixpost\Services\FacebookService;
+use Inovector\Mixpost\Services\GoogleService;
+use Inovector\Mixpost\Services\LinkedInService;
+use Inovector\Mixpost\Services\OpenAIService;
+use Inovector\Mixpost\Services\PinterestService;
 use Inovector\Mixpost\Services\TenorService;
+use Inovector\Mixpost\Services\ThreadsService;
+use Inovector\Mixpost\Services\TikTokService;
 use Inovector\Mixpost\Services\TwitterService;
 use Inovector\Mixpost\Services\UnsplashService;
 use Inovector\Mixpost\Support\Log;
 
 class ServiceManager
 {
-    protected ?ServiceCollection $cacheServices = null;
+    protected static mixed $retrievalAction = null;
     protected mixed $config;
+
+    protected ?ServiceCollection $cacheServices = null;
 
     public function __construct(Container $container)
     {
@@ -31,9 +40,16 @@ class ServiceManager
     {
         return [
             FacebookService::class,
+            ThreadsService::class,
+            BlueskyService::class,
+            GoogleService::class,
             TwitterService::class,
+            LinkedInService::class,
+            TikTokService::class,
+            PinterestService::class,
             UnsplashService::class,
             TenorService::class,
+            OpenAIService::class,
         ];
     }
 
@@ -134,6 +150,14 @@ class ServiceManager
 
     public function get(string $name, null|string $key = null)
     {
+        if ($retrievalAction = self::$retrievalAction) {
+            $result = call_user_func(self::$retrievalAction, $name, $key);
+
+            if (is_callable($retrievalAction) && $result !== null) {
+                return $result;
+            }
+        }
+
         // Mastodon service is not exists. Each Mastodon server has its own configuration.
         // Mastodon configuration is stored during connection process.
         $isMastodon = Str::startsWith($name, 'mastodon.');
@@ -206,6 +230,11 @@ class ServiceManager
         foreach ($this->services()->getNames() as $service) {
             $this->forget($service);
         }
+    }
+
+    public function retrievalAction(callable $action): void
+    {
+        self::$retrievalAction = $action;
     }
 
     protected function resolveCacheKey(string $name): string

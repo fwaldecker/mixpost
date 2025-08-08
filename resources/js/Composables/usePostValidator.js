@@ -1,7 +1,7 @@
 import {computed, inject} from "vue";
 import {isEmpty} from "lodash";
 
-const usePostValidator = () => {
+const usePost = () => {
     const postCtx = inject('postCtx');
 
     const errors = computed(() => {
@@ -73,4 +73,4 @@ const usePostValidator = () => {
     }
 }
 
-export default usePostValidator;
+export default usePost;

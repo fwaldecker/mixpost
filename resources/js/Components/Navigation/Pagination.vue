@@ -62,7 +62,7 @@ const formattedLinks = computed(() => {
                 </div>
                 <Link v-else :key="`link-${index}`" disabled
                       class="transition-colors ease-in-out duration-200"
-                      :class="[linkClass, { 'bg-indigo-500 text-white': link.active, 'hover:text-indigo-500 focus:text-indigo-500': !link.active, 'px-xs!': link.component }]"
+                      :class="[linkClass, { 'bg-primary-500 text-white': link.active, 'hover:text-primary-500 focus:text-primary-500': !link.active, 'px-xs!': link.component }]"
                       :href="link.url">
                     <template v-if="link.component">
                         <component :is="link.component"/>

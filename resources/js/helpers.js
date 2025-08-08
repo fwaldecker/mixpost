@@ -1,6 +1,6 @@
 import {isProxy, toRaw} from "vue";
 import {utcToZonedTime} from "date-fns-tz";
-import {format} from "date-fns";
+import useDateLocalize from "./Composables/useDateLocalize";
 
 export function getWindowDimensions() {
     let width = Math.max(
@@ -100,6 +100,30 @@ export function convertTime12to24(time12h) {
     return `${hours}:${minutes}`;
 }
 
+export function parseDateTime(datetime, timeZone, _timeFormat) {
+    const zonedDateTime = utcToZonedTime(datetime, timeZone);
+    const today = utcToZonedTime(new Date().toISOString(), timeZone);
+
+    return {
+        zonedDateTime,
+        format: zonedDateTime.getFullYear() === today.getFullYear()
+            ? `MMMM d, ${timeFormat(_timeFormat)}`
+            : `MMMM d, yyyy, ${timeFormat(_timeFormat)}`,
+    };
+}
+
+export function dateTimeFormat(datetime, timeZone, _timeFormat, customFormat = null) {
+    const {translatedFormat} = useDateLocalize();
+
+    const {zonedDateTime, format} = parseDateTime(datetime, timeZone, _timeFormat);
+
+    return translatedFormat(zonedDateTime, customFormat ? customFormat : format);
+}
+
+export function timeFormat(value) {
+    return value === 24 ? 'H:mm' : 'h:mmaaa';
+}
+
 export function convertTime24to12(time24h, customFormat = 'h:mmaaa') {
     const date = new Date();
 
@@ -107,9 +131,28 @@ export function convertTime24to12(time24h, customFormat = 'h:mmaaa') {
 
     date.setHours(hours, minutes);
 
-    return format(date, customFormat);
+    const {translatedFormat} = useDateLocalize();
+
+    return translatedFormat(date, customFormat);
 }
 
 export function toRawIfProxy(obj) {
     return isProxy(obj) ? toRaw(obj) : obj
 }
+
+export function convertLaravelErrorsToString(object) {
+    return Object.keys(object).map((item) => {
+        if (typeof object[item] === 'string') {
+            return object[item];
+        }
+
+        return object[item].join("\n");
+    }).join("\n");
+}
+
+export function extractFirstURL(text) {
+    const urlRegex = /(\bhttps?:\/\/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))/i;
+    const match = text.match(urlRegex);
+    return match ? match[0] : null;
+}
+

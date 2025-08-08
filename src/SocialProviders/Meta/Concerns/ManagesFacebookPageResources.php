@@ -5,16 +5,21 @@ namespace Inovector\Mixpost\SocialProviders\Meta\Concerns;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Http;
 use Inovector\Mixpost\Enums\SocialProviderResponseStatus;
+use Inovector\Mixpost\Support\AccountSuffix;
 use Inovector\Mixpost\Support\SocialProviderResponse;
 
 trait ManagesFacebookPageResources
 {
+    use FacebookPostPublication;
+    use FacebookReelPublication;
+    use FacebookStoryPublication;
+    use FacebookComments;
+
     public function getAccount(): SocialProviderResponse
     {
-        $response = Http::get("$this->apiUrl/$this->apiVersion/me", [
-            'fields' => 'id,name,username,picture{url}',
+        $response = $this->getHttpClient()::get("$this->apiUrl/$this->apiVersion/me", [
+            'fields' => 'id,name,username,picture{url},location',
             'access_token' => $this->getAccessToken()['page_access_token']
         ]);
 
@@ -26,15 +31,16 @@ trait ManagesFacebookPageResources
                 'name' => $data['name'],
                 'username' => $data['username'] ?? '',
                 'image' => Arr::get($data, 'picture.data.url'),
+                'data' => AccountSuffix::schema(strval(Arr::get($data, 'location.city')))
             ];
         });
     }
 
     public function getEntities(bool $withAccessToken = false): SocialProviderResponse
     {
-        $response = Http::withToken($this->getAccessToken()['access_token'])
+        $response = $this->getHttpClient()::withToken($this->getAccessToken()['access_token'])
             ->get("$this->apiUrl/$this->apiVersion/me/accounts", [
-                'fields' => 'id,name,username,picture{url}' . ($withAccessToken ? ',access_token' : ''),
+                'fields' => 'id,name,username,picture{url},location' . ($withAccessToken ? ',access_token' : ''),
                 'limit' => 200
             ]);
 
@@ -45,6 +51,7 @@ trait ManagesFacebookPageResources
                     'name' => $item['name'],
                     'username' => $item['username'] ?? '',
                     'image' => Arr::get($item, 'picture.data.url'),
+                    'data' => AccountSuffix::schema(strval(Arr::get($item, 'location.city'))),
                 ];
 
                 if ($withAccessToken) {
@@ -60,12 +67,19 @@ trait ManagesFacebookPageResources
 
     public function publishPost(string $text, Collection $media, array $params = []): SocialProviderResponse
     {
-        return parent::publishFacebookPost($text, $media, $params, $this->getAccessToken()['page_access_token']);
+        $type = Arr::get($params, 'type', 'post');
+
+        return match ($type) {
+            'post' => $this->publishFacebookStandardPost($text, $media, $params),
+            'reel' => $this->publishFacebookReel($text, $media),
+            'story' => $this->publishFacebookStory($media),
+            default => $this->response(SocialProviderResponseStatus::NO_CONTENT, []),
+        };
     }
 
     public function getPageAudience(): SocialProviderResponse
     {
-        $response = Http::get("$this->apiUrl/$this->apiVersion/{$this->values['provider_id']}", [
+        $response = $this->getHttpClient()::get("$this->apiUrl/$this->apiVersion/{$this->values['provider_id']}", [
             'fields' => 'fan_count,followers_count',
             'access_token' => $this->getAccessToken()['page_access_token']
         ]);
@@ -76,16 +90,40 @@ trait ManagesFacebookPageResources
     public function getPageInsights(): SocialProviderResponse
     {
         $data = [
-            'access_token' => $this->getAccessToken()['page_access_token'],
+            'access_token' => $this->accessToken(),
             'metric' => 'page_post_engagements,page_posts_impressions', // facebook deprecated `page_engaged_users` metric
             'period' => 'day',
             'since' => Carbon::today('UTC')->subDays(90)->toDateString(),
             'until' => Carbon::today('UTC')->toDateString(),
         ];
 
-        $response = Http::get("$this->apiUrl/$this->apiVersion/{$this->values['provider_id']}/insights", $data);
+        $response = $this->getHttpClient()::get("$this->apiUrl/$this->apiVersion/{$this->values['provider_id']}/insights", $data);
 
         return $this->buildResponse($response);
+    }
+
+    public function getPosts(): SocialProviderResponse
+    {
+        $data = [
+            'access_token' => $this->accessToken(),
+            'limit' => 100,
+            'period' => 'day',
+            'since' => Carbon::today('UTC')->subDays(90)->toDateString(),
+            'until' => Carbon::today('UTC')->toDateString(),
+        ];
+
+        $response = $this->getHttpClient()::get("$this->apiUrl/$this->apiVersion/{$this->values['provider_id']}/feed", $data);
+
+        return $this->buildResponse($response);
+    }
+
+    public function getStories(): SocialProviderResponse
+    {
+        $result = $this->getHttpClient()::get("$this->apiUrl/$this->apiVersion/{$this->values['provider_id']}/stories", [
+            'access_token' => $this->accessToken()
+        ]);
+
+        return $this->buildResponse($result);
     }
 
     public function deletePost($id): SocialProviderResponse

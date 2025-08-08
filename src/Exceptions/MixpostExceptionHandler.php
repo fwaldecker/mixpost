@@ -2,19 +2,33 @@
 
 namespace Inovector\Mixpost\Exceptions;
 
+use Closure;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Inertia\Inertia;
-use Inovector\Mixpost\Http\Middleware\HandleInertiaRequests;
+use Inovector\Mixpost\Http\Base\Middleware\HandleInertiaRequests;
+use Inovector\Mixpost\Http\Base\Middleware\Localization;
+use Inovector\Mixpost\Mixpost;
 use Inovector\Mixpost\Util;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class MixpostExceptionHandler extends ExceptionHandler
 {
+    public function register(): void
+    {
+        with(Mixpost::$reportCallback, function ($handler) {
+            if ($handler instanceof Closure) {
+                $this->reportable(function (Throwable $e) use ($handler) {
+                    call_user_func($handler, $e);
+                })->stop();
+            }
+        });
+    }
+
     public function render($request, Throwable $e): Response|JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         if (Util::isMixpostRequest($request)) {
@@ -36,20 +50,28 @@ class MixpostExceptionHandler extends ExceptionHandler
     {
         $statusCode = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : ($e->status ?? 500);
 
+        app(Localization::class)->handle($request, fn() => null);
+
         $shared = (new HandleInertiaRequests())->share($request);
 
-        Inertia::setRootView('mixpost::app');
+        Inertia::setRootView('mixpost::layouts.app');
         Inertia::share($shared);
 
+//        if ($statusCode === 419) {
+//            return Inertia::location(redirect()->back()->with([
+//                'warning' => __('mixpost::error.page_expired')
+//            ]));
+//        }
+
         if ($statusCode === 403) {
-            return Inertia::render('ErrorPage', [
+            return Inertia::render('Main/ErrorPage', [
                 'title' => 'Access forbidden!',
                 'text' => 'You do not have access to this page.'
             ])->toResponse($request)->setStatusCode($statusCode);
         }
 
         if ($statusCode === 404) {
-            return Inertia::render('ErrorPage', [
+            return Inertia::render('Main/ErrorPage', [
                 'title' => '404 - Whoops...',
                 'text' => "The page you are trying to view does not exist."
             ])->toResponse($request)->setStatusCode($statusCode);
@@ -63,7 +85,7 @@ class MixpostExceptionHandler extends ExceptionHandler
         }
 
         if ($statusCode === 500 && !App::hasDebugModeEnabled()) {
-            return Inertia::render('ErrorPage', [
+            return Inertia::render('Main/ErrorPage', [
                 'title' => 'Internal error',
                 'text' => 'An internal error has occurred.'
             ])->toResponse($request)->setStatusCode(500);

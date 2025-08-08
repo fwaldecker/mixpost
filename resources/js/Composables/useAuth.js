@@ -6,8 +6,18 @@ const useAuth = () => {
         return usePage().props.auth.user;
     })
 
+    const impersonating = computed(() => {
+        return usePage().props.auth.impersonating;
+    })
+
+    const workspaces = computed(() => {
+        return user.value.workspaces;
+    })
+
     return {
-        user
+        user,
+        impersonating,
+        workspaces
     }
 };
 

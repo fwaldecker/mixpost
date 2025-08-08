@@ -34,6 +34,14 @@
   @apply text-blue-300 hover:text-blue-200 transition-colors ease-in-out duration-200;
 }
 
+@utility link-primary {
+  @apply font-medium text-primary-500 hover:text-primary-700;
+}
+
+@utility destructive {
+  @apply text-red-500 hover:text-red-400 transition-colors ease-in-out duration-200;
+}
+
 @utility row-px {
   @apply px-3 sm:px-6 lg:px-8;
 }

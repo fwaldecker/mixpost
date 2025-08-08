@@ -3,6 +3,7 @@ import {computed} from "vue";
 import useProviderClassesColor from "@/Composables/useProviderClassesColor";
 import ProviderIcon from "@/Components/Account/ProviderIcon.vue";
 import ExclamationCircleIcon from "@/Icons/ExclamationCircle.vue";
+import Avatar from "../DataDisplay/Avatar.vue";
 
 const props = defineProps({
     imgUrl: {
@@ -12,6 +13,10 @@ const props = defineProps({
     provider: {
         type: String,
         required: true,
+    },
+    name: {
+        type: String,
+        required: true
     },
     active: {
         type: Boolean,
@@ -63,7 +68,10 @@ const iconClasses = computed(() => {
               class="flex items-center justify-center relative border-2 p-1 rounded-full bg-white">
             <span :class="[activeBgClasses, sizeImgClasses, {'grayscale': !active}]"
                   class="inline-flex justify-center items-center shrink-0 rounded-full">
-                <img :src="imgUrl" class="object-cover w-full h-full rounded-full" alt=""/>
+                <img v-if="imgUrl" :src="imgUrl" class="object-cover w-full h-full rounded-full" alt=""/>
+                <template v-else>
+                    <Avatar :name="name"/>
+                </template>
             </span>
             <span v-if="warningMessage" v-tooltip="warningMessage"
                   class="flex items-center justify-center rounded-full absolute top-0 -ml-12 bg-orange-500 text-white">

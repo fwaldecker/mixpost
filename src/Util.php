@@ -4,24 +4,44 @@ namespace Inovector\Mixpost;
 
 use DateTimeInterface;
 use DateTimeZone;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
+use Inovector\Mixpost\Concerns\UsesUserModel;
 use Inovector\Mixpost\Facades\Settings;
 
 class Util
 {
+    use UsesUserModel;
+
     public static function config(string $key, mixed $default = null)
     {
         return Config::get("mixpost.$key", $default);
     }
 
+    public static function corePath(): string
+    {
+        return self::config('core_path', 'mixpost');
+    }
+
+    public static function appName(): string
+    {
+        return Config::get('app.name');
+    }
+
     public static function isMixpostRequest(Request $request): bool
     {
-        $path = 'mixpost';
+        $path = self::corePath();
 
         return $request->is($path) ||
             $request->is("$path/*");
+    }
+
+    public static function isHorizonRequest(): bool
+    {
+        return request()->route() && request()->route()->getPrefix() === 'horizon/api';
     }
 
     public static function convertTimeToUTC(string|DateTimeInterface|null $time = null, DateTimeZone|string|null $tz = null): Carbon
@@ -41,6 +61,14 @@ class Util
         return Settings::get('time_format') == 24 ? 'H:i' : 'h:ia';
     }
 
+    public static function isTimestampString(string $string): bool
+    {
+        // Regular expression to match the date format: Y-m-dTH:i:s.uZ
+        $pattern = '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/';
+
+        return preg_match($pattern, $string) === 1;
+    }
+
     public static function removeHtmlTags($string): string
     {
         if (!$string) {
@@ -50,6 +78,11 @@ class Util
         $text = trim(strip_tags($string));
 
         return html_entity_decode($text);
+    }
+
+    public static function isAdminConsole(Request $request): bool
+    {
+        return $request->route() && Str::contains($request->route()->getPrefix(), (Util::corePath() . '/admin'));
     }
 
     public static function isPublicDomainUrl(string $url): bool
@@ -77,16 +110,23 @@ class Util
         return true;
     }
 
-    public static function getDatabaseDriver(?string $connection = null): string
+    public static function estimateUploadTimeout(int $size, int $defaultTimeout = 30)
     {
-        $key = is_null($connection) ? Config::get('database.default') : $connection;
+        $uploadSpeed = 2 * 1024 * 1024; // 2MB/s
+        $estimatedTimeout = $size / $uploadSpeed;
 
-        return strtolower(Config::get('database.connections.' . $key . '.driver'));
+        return max($estimatedTimeout, $defaultTimeout);
     }
 
-    public static function isMysqlDatabase(?string $connection = null): bool
+    public static function estimateDelayByFileSize(int $fileSize): array
     {
-        return self::getDatabaseDriver($connection) === 'mysql';
+        $initial = (int)round(max(15, $fileSize / 1000000)); // Set a delay proportional to the file size
+        $max = (int)round(min(5 * 60, $fileSize / 500000)); // Set a max delay proportional to the file size
+
+        return [
+            'initial' => $initial,
+            'max' => $max
+        ];
     }
 
     public static function closeAndDeleteStreamResource(array $stream): void
@@ -98,6 +138,21 @@ class Util
         if (isset($stream['temporaryDirectory'])) {
             $stream['temporaryDirectory']->delete();
         }
+    }
+
+    public static function performHttpRequestWithTimeoutRetries(callable $httpRequestFunction, int $timeout = 30, int $maxAttempts = 3)
+    {
+        $startTimeout = $timeout;
+
+        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+            try {
+                return $httpRequestFunction($timeout);
+            } catch (ConnectionException $e) {
+                $timeout += $startTimeout;
+            }
+        }
+
+        return null;
     }
 
     public static function performTaskWithDelay(callable $task, int $initialDelay = 15, int $maxDelay = 60, int $maxAttempts = 10)
@@ -125,6 +180,18 @@ class Util
         return null;
     }
 
+    public static function getDatabaseDriver(?string $connection = null): string
+    {
+        $key = is_null($connection) ? Config::get('database.default') : $connection;
+
+        return strtolower(Config::get('database.connections.' . $key . '.driver'));
+    }
+
+    public static function isMysqlDatabase(?string $connection = null): bool
+    {
+        return self::getDatabaseDriver($connection) === 'mysql';
+    }
+
     public static function isFFmpegInstalled(): bool
     {
         $ffmpegPath = Util::config('ffmpeg_path');
@@ -132,7 +199,7 @@ class Util
 
         return file_exists($ffmpegPath) &&
             file_exists($ffprobePath) &&
-            str_ends_with($ffmpegPath, 'ffmpeg') &&
-            str_ends_with($ffprobePath, 'ffprobe');
+            basename($ffmpegPath) == 'ffmpeg' &&
+            basename($ffprobePath) == 'ffprobe';
     }
 }

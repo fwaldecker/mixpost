@@ -11,20 +11,19 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Inovector\Mixpost\Concerns\Job\HasSocialProviderJobRateLimit;
 use Inovector\Mixpost\Concerns\Job\SocialProviderException;
-use Inovector\Mixpost\Concerns\Job\SocialProviderJobFail;
 use Inovector\Mixpost\Concerns\UsesSocialProviderManager;
+use Inovector\Mixpost\Contracts\QueueWorkspaceAware;
 use Inovector\Mixpost\Models\Account;
 use Inovector\Mixpost\Models\Audience;
 use Inovector\Mixpost\SocialProviders\Twitter\TwitterProvider;
 use Inovector\Mixpost\Support\SocialProviderResponse;
 
-class ImportTwitterFollowersJob implements ShouldQueue
+class ImportTwitterFollowersJob implements ShouldQueue, QueueWorkspaceAware
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     use UsesSocialProviderManager;
     use HasSocialProviderJobRateLimit;
-    use SocialProviderJobFail;
     use SocialProviderException;
 
     public $deleteWhenMissingModels = true;

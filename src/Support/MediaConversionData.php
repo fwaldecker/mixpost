@@ -2,6 +2,7 @@
 
 namespace Inovector\Mixpost\Support;
 
+use Illuminate\Support\Facades\Storage;
 use Inovector\Mixpost\Contracts\MediaConversion;
 
 class MediaConversionData
@@ -22,10 +23,14 @@ class MediaConversionData
     {
         $reflection = new \ReflectionClass($this->conversion);
 
+        $path = $this->conversion->getPath();
+        $disk = $this->conversion->getToDisk();
+
         return [
             'engine' => $this->conversion->getEngineName(),
             'path' => $this->conversion->getPath(),
             'disk' => $this->conversion->getToDisk(),
+            'size' => Storage::disk($disk)->size($path),
             'name' => $reflection->getProperty('name')->getValue($this->conversion),
         ];
     }

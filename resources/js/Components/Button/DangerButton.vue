@@ -14,6 +14,10 @@ const props = defineProps({
     isLoading: {
         type: Boolean,
         default: false,
+    },
+    hiddenTextOnSmallScreen: {
+        type: Boolean,
+        default: false,
     }
 });
 
@@ -22,8 +26,16 @@ const {sizeClass} = useButtonSize(props.size);
 
 <template>
     <button :type="type" :class="sizeClass"
-            class="relative inline-flex items-center bg-red-500 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-700 focus:border-red-700 focus:shadow-outline-red disabled:bg-red-400 disabled:cursor-not-allowed transition ease-in-out duration-200">
-        <slot/>
+            class="relative inline-flex items-center bg-red-500 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest rtl:tracking-normal hover:bg-red-700 active:bg-red-700 focus:border-red-700 focus:shadow-outline-red disabled:bg-red-200 disabled:text-gray-600 disabled:cursor-not-allowed transition ease-in-out duration-200">
+        <span v-if="$slots.icon" class="inline-flex"
+              :class="{'sm:mr-xs sm:rtl:mr-0 sm:rtl:ml-xs': $slots.default, 'mr-0 sm:mr-xs sm:rtl:mr-0 sm:rtl:ml-xs': hiddenTextOnSmallScreen, 'mr-xs rtl:mr-xs rtl:ml-xs': !hiddenTextOnSmallScreen && $slots.default}">
+            <slot name="icon"/>
+        </span>
+
+        <span v-if="$slots.default" class="inline-flex items-center" :class="{'hidden sm:inline': hiddenTextOnSmallScreen}">
+            <slot/>
+        </span>
+
         <span v-if="isLoading" class="absolute left-0 top-0 flex justify-center items-center w-full h-full bg-red-500">
              <CircleLoadingIcon class="animate-spin text-white"/>
         </span>

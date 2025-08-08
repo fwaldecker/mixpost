@@ -2,11 +2,11 @@
 
 namespace Inovector\Mixpost\SocialProviders\Twitter\Concerns;
 
+use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Inovector\Mixpost\Enums\SocialProviderResponseStatus;
 use Inovector\Mixpost\Support\SocialProviderResponse;
-use Exception;
 
 trait ManagesResources
 {
@@ -37,47 +37,9 @@ trait ManagesResources
         }
 
         return match ($this->getTier()) {
-            'legacy' => $this->storePostWithApiV1($text, $mediaResult),
-            default => $this->storePostWithApiV2($text, $mediaResult),
+            'legacy' => $this->storePostWithApiV1($text, $mediaResult, $params),
+            default => $this->storePostWithApiV2($text, $mediaResult, $params),
         };
-    }
-
-    protected function storePostWithApiV1(string $text, array $mediaResult): SocialProviderResponse
-    {
-        $this->connection->setApiVersion('1.1');
-
-        $postParameters = ['status' => $text];
-
-        if (!empty($mediaResult['ids'])) {
-            $postParameters['media_ids'] = implode(',', $mediaResult['ids']);
-        }
-
-        $postResult = $this->connection->post('statuses/update', $postParameters);
-
-        return $this->buildResponse($postResult, function () use ($postResult) {
-            return [
-                'id' => $postResult->id
-            ];
-        });
-    }
-
-    protected function storePostWithApiV2(string $text, array $mediaResult): SocialProviderResponse
-    {
-        $this->connection->setApiVersion(2);
-
-        $postParameters = ['text' => $text];
-
-        if (!empty($mediaResult['ids'])) {
-            $postParameters['media']['media_ids'] = $mediaResult['ids'];
-        }
-
-        $postResult = $this->connection->post('tweets', $postParameters, ['jsonPayload' => true]);
-
-        return $this->buildResponse($postResult, function () use ($postResult) {
-            return [
-                'id' => $postResult->data->id
-            ];
-        });
     }
 
     public function uploadMedia(Collection $media): array
@@ -138,9 +100,16 @@ trait ManagesResources
                 } while (in_array($state, ['pending', 'in_progress']));
 
                 if ($state === 'failed') {
-                    $errors[] = "Failed to upload {$item['name']} file.";
+                    $errors[] = 'upload_failed';
                     continue;
                 }
+            }
+
+            if ($item->alt_text) {
+                $this->connection->mediaMetadataCreate(
+                    media_id: $result->media_id_string,
+                    alt_text:  $item->alt_text
+                );
             }
 
             $ids[] = $result->media_id_string;
@@ -150,6 +119,52 @@ trait ManagesResources
             'ids' => $ids,
             'errors' => $errors
         ];
+    }
+
+    protected function storePostWithApiV1(string $text, array $mediaResult, array $params): SocialProviderResponse
+    {
+        $this->connection->setApiVersion('1.1');
+
+        $postParameters = ['status' => $text];
+
+        if ($lastId = $params['last_id'] ?? null) {
+            $postParameters['in_reply_to_status_id'] = $lastId;
+        }
+
+        if (!empty($mediaResult['ids'])) {
+            $postParameters['media_ids'] = implode(',', $mediaResult['ids']);
+        }
+
+        $postResult = $this->connection->post('statuses/update', $postParameters);
+
+        return $this->buildResponse($postResult, function () use ($postResult) {
+            return [
+                'id' => $postResult->id
+            ];
+        });
+    }
+
+    protected function storePostWithApiV2(string $text, array $mediaResult, array $params): SocialProviderResponse
+    {
+        $this->connection->setApiVersion(2);
+
+        $postParameters = ['text' => $text];
+
+        if ($lastId = $params['last_id'] ?? null) {
+            $postParameters['reply']['in_reply_to_tweet_id'] = $lastId;
+        }
+
+        if (!empty($mediaResult['ids'])) {
+            $postParameters['media']['media_ids'] = $mediaResult['ids'];
+        }
+
+        $postResult = $this->connection->post('tweets', $postParameters, ['jsonPayload' => true]);
+
+        return $this->buildResponse($postResult, function () use ($postResult) {
+            return [
+                'id' => $postResult->data->id
+            ];
+        });
     }
 
     public function getAccountMetrics(): SocialProviderResponse

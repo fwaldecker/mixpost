@@ -13,12 +13,7 @@ class FacebookService extends Service
         return ServiceGroup::SOCIAL;
     }
 
-    public static function versions(): array
-    {
-        return ['v23.0', 'v22.0', 'v21.0', 'v20.0', 'v19.0', 'v18.0', 'v17.0', 'v16.0'];
-    }
-
-    static function form(): array
+    public static function form(): array
     {
         return [
             'client_id' => '',
@@ -39,9 +34,14 @@ class FacebookService extends Service
     public static function formMessages(): array
     {
         return [
-            'client_id' => 'The App ID is required.',
-            'client_secret' => 'The APP Secret is required.',
-            'api_version' => 'The API Version is required.',
+            'client_id' => __('validation.required', ['attribute' => 'App ID']),
+            'client_secret' => __('validation.required', ['attribute' => 'APP Secret']),
+            'api_version' => __('validation.required', ['attribute' => 'API Version']),
         ];
+    }
+
+    public static function versions(): array
+    {
+        return ['v23.0', 'v22.0', 'v21.0', 'v20.0', 'v19.0', 'v18.0', 'v17.0', 'v16.0'];
     }
 }

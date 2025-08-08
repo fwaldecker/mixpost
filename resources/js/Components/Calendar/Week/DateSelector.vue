@@ -35,7 +35,7 @@ const selectNext = () => {
 </script>
 <template>
     <div class="flex items-center">
-        <SecondaryButton @click="selectCurrent" class="mr-xs">Today</SecondaryButton>
+        <SecondaryButton @click="selectCurrent" class="mr-xs">{{ $t('calendar.today') }}</SecondaryButton>
 
         <div class="flex items-center">
             <PureButton @click="selectPrevious" class="mr-xs"><ChevronLeftIcon/></PureButton>

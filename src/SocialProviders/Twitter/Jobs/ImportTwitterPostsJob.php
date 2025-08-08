@@ -12,19 +12,19 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Arr;
 use Inovector\Mixpost\Concerns\Job\HasSocialProviderJobRateLimit;
 use Inovector\Mixpost\Concerns\Job\SocialProviderException;
-use Inovector\Mixpost\Concerns\Job\SocialProviderJobFail;
 use Inovector\Mixpost\Concerns\UsesSocialProviderManager;
+use Inovector\Mixpost\Contracts\QueueWorkspaceAware;
+use Inovector\Mixpost\Facades\WorkspaceManager;
 use Inovector\Mixpost\Models\Account;
 use Inovector\Mixpost\Models\ImportedPost;
 use Inovector\Mixpost\SocialProviders\Twitter\TwitterProvider;
 
-class ImportTwitterPostsJob implements ShouldQueue
+class ImportTwitterPostsJob implements ShouldQueue, QueueWorkspaceAware
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     use UsesSocialProviderManager;
     use HasSocialProviderJobRateLimit;
-    use SocialProviderJobFail;
     use SocialProviderException;
 
     public $deleteWhenMissingModels = true;
@@ -101,6 +101,7 @@ class ImportTwitterPostsJob implements ShouldQueue
     {
         $data = Arr::map($items, function ($item) {
             return [
+                'workspace_id' => WorkspaceManager::current()->id,
                 'account_id' => $this->account->id,
                 'provider_post_id' => $item->id,
                 'content' => json_encode(['text' => $item->text]),
@@ -115,6 +116,6 @@ class ImportTwitterPostsJob implements ShouldQueue
             ];
         });
 
-        ImportedPost::upsert($data, ['account_id', 'provider_post_id'], ['content', 'metrics']);
+        ImportedPost::upsert($data, ['workspace_id', 'account_id', 'provider_post_id'], ['content', 'metrics']);
     }
 }

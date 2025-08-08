@@ -1,5 +1,6 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed, inject, ref} from "vue";
+import {useI18n} from "vue-i18n";
 import {usePage} from "@inertiajs/vue3";
 import {router} from "@inertiajs/vue3";
 import emitter from "@/Services/emitter";
@@ -15,11 +16,22 @@ import DangerButton from "@/Components/Button/DangerButton.vue"
 import PencilSquareIcon from "@/Icons/PencilSquare.vue";
 import DuplicateIcon from "@/Icons/Duplicate.vue";
 import TrashIcon from "@/Icons/Trash.vue";
+import ArrowUturnLeft from "../../Icons/ArrowUturnLeft.vue";
+import useWorkspace from "../../Composables/useWorkspace.js";
+import Eye from "../../Icons/Eye.vue";
+
+const {t: $t} = useI18n()
+
+const workspaceCtx = inject('workspaceCtx');
 
 const props = defineProps({
     itemId: {
-        type: Number,
+        type: String,
         required: true,
+    },
+    trashed: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -34,12 +46,17 @@ const filterStatus = computed(() => {
 });
 
 const {notify} = useNotifications();
+const {isWorkspaceEditorRole} = useWorkspace();
 
 const deletePost = () => {
-    router.delete(route('mixpost.posts.delete', {post: props.itemId, status: filterStatus.value}), {
+    router.delete(route('mixpost.posts.delete', {
+        workspace: workspaceCtx.id,
+        post: props.itemId,
+        status: filterStatus.value
+    }), {
         onSuccess() {
             confirmationDeletion.value = false;
-            notify('success', 'Post deleted')
+            notify('success', filterStatus.value === 'trash' ? $t("post.post_deleted_permanently") : $t("post.post_moved_to_trash"))
             emit('onDelete')
             emitter.emit('postDelete', props.itemId);
         }
@@ -47,9 +64,17 @@ const deletePost = () => {
 }
 
 const duplicate = () => {
-    router.post(route('mixpost.posts.duplicate', {post: props.itemId}), {}, {
+    router.post(route('mixpost.posts.duplicate', {workspace: workspaceCtx.id, post: props.itemId}), {}, {
         onSuccess() {
-            notify('success', 'Post duplicated')
+            notify('success', $t('post.post_duplicated'))
+        }
+    })
+}
+
+const restore = () => {
+    router.post(route('mixpost.posts.restore', {workspace: workspaceCtx.id, post: props.itemId}), {}, {
+        onSuccess() {
+            notify('success', $t('post.post_restored'))
         }
     })
 }
@@ -57,41 +82,68 @@ const duplicate = () => {
 <template>
     <div>
         <div class="flex flex-row items-center gap-xs">
-            <PureButtonLink :href="route('mixpost.posts.edit', {post: itemId})" v-tooltip="'Edit'">
-                <PencilSquareIcon/>
+            <PureButtonLink :href="route('mixpost.posts.edit', { workspace: workspaceCtx.id, post: itemId })"
+                            v-tooltip="$t(!isWorkspaceEditorRole ? 'general.view' : 'general.edit')">
+                <template v-if="!isWorkspaceEditorRole">
+                    <Eye/>
+                </template>
+                <template v-else>
+                    <PencilSquareIcon/>
+                </template>
             </PureButtonLink>
 
-            <Dropdown width-classes="w-32" placement="bottom-end">
-                <template #trigger>
-                    <PureButton class="mt-1">
-                        <EllipsisVerticalIcon/>
-                    </PureButton>
-                </template>
+            <template v-if="isWorkspaceEditorRole">
+                <Dropdown placement="bottom-end">
+                    <template #trigger>
+                        <PureButton class="mt-1">
+                            <EllipsisVerticalIcon/>
+                        </PureButton>
+                    </template>
 
-                <template #content>
-                    <DropdownItem @click="duplicate" as="button">
-                        <DuplicateIcon class="w-5! h-5! mr-1"/>
-                        Duplicate
-                    </DropdownItem>
+                    <template #content>
+                        <template v-if="trashed">
+                            <DropdownItem @click="restore" as="button">
+                                <template #icon>
+                                    <ArrowUturnLeft/>
+                                </template>
+                                {{ $t("general.restore") }}
+                            </DropdownItem>
+                        </template>
 
-                    <DropdownItem @click="confirmationDeletion = true" as="button">
-                        <TrashIcon class="w-5! h-5! mr-1 text-red-500"/>
-                        Delete
-                    </DropdownItem>
-                </template>
-            </Dropdown>
+                        <DropdownItem @click="duplicate" as="button">
+                            <template #icon>
+                                <DuplicateIcon/>
+                            </template>
+
+                            {{ $t("general.duplicate") }}
+                        </DropdownItem>
+
+                        <DropdownItem @click="confirmationDeletion = true" as="button">
+                            <template #icon>
+                                <TrashIcon class="text-red-500"/>
+                            </template>
+
+                            {{ $t("general.delete") }}
+                        </DropdownItem>
+                    </template>
+                </Dropdown>
+            </template>
         </div>
 
         <ConfirmationModal :show="confirmationDeletion" variant="danger" @close="confirmationDeletion = false">
             <template #header>
-                Delete post
+                {{ $t("post.delete_post") }}
             </template>
             <template #body>
-                Are you sure you want to delete this post?
+                {{ $t("post.confirm_delete_post") }}
             </template>
             <template #footer>
-                <SecondaryButton @click="confirmationDeletion = false" class="mr-xs">Cancel</SecondaryButton>
-                <DangerButton @click="deletePost">Delete</DangerButton>
+                <SecondaryButton @click="confirmationDeletion = false" class="mr-xs"> {{ $t("general.cancel") }}
+                </SecondaryButton>
+                <DangerButton @click="deletePost">{{
+                        trashed ? $t("general.delete_permanently") : $t("general.delete")
+                    }}
+                </DangerButton>
             </template>
         </ConfirmationModal>
     </div>

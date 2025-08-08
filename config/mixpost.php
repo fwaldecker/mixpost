@@ -2,19 +2,64 @@
 
 return [
     /*
-    * This option controls the default authentication "guard" for the Mixpost routes
-    */
+     * This option controls the default authentication "guard" for the Mixpost dashboard routes
+     */
     'auth_guard' => env('MIXPOST_AUTH_GUARD', 'web'),
 
     /*
-    * If you use another model for users, you can change it here.
+     * This is the path that Mixpost will use to load its core routes and assets.
+     * You may change it if it conflicts with your other routes.
+     */
+    'core_path' => env('MIXPOST_CORE_PATH', 'mixpost'),
+
+    /*
+     * This option will force the callback url to use the native `mixpost` core path.
+     * If you want to use custom core path, for the dashboard, but you want to use the native `mixpost` core path for the callback url,
+     */
+    'force_core_path_callback_to_native' => env('FORCE_CORE_PATH_CALLBACK_TO_NATIVE', false),
+
+    /*
+    * Public pages have an endpoint directly after the url domain.
+    * If your application already has direct routes, you must set a prefix to avoid conflicts between routes.
     */
+    'public_pages_prefix' => env('MIXPOST_PUBLIC_PAGES_PREFIX', 'pages'),
+
+    /*
+     * If you use another model for users, you can change it here.
+     * It need to be extended the `Inovector\Mixpost\Abstracts\User` class.
+     *
+     * @deprecated This config will be removed on next major release.
+     */
     'user_model' => \Inovector\Mixpost\Models\User::class,
 
     /*
-     * Mixpost will redirect unauthorized users to the route name specified here
+     * Mixpost will redirect unauthorized users to the route name specified here.
      */
-    'redirect_unauthorized_users_to_route' => 'login',
+    'redirect_unauthorized_users_to_route' => 'mixpost.login',
+
+    /*
+     *  These middleware will be assigned to the main Mixpost routes which require authentication.
+     *  You can add your own middlewares.
+     */
+    'middlewares' => [
+        'web' => [
+            'app' => [
+                'web',
+                \Inovector\Mixpost\Http\Base\Middleware\Bootstrap::class,
+                \Inovector\Mixpost\Http\Base\Middleware\Localization::class
+            ],
+            'dashboard' => [
+                \Inovector\Mixpost\Http\Base\Middleware\Authenticate::class,
+            ],
+        ],
+        'api' => [
+            'api',
+            \Inovector\Mixpost\Http\Api\Middleware\Bootstrap::class,
+            \Inovector\Mixpost\Http\Api\Middleware\ForceJsonResponse::class,
+            \Inovector\Mixpost\Http\Api\Middleware\Authenticate::class . ':mixpost_access_token',
+            \Inovector\Mixpost\Http\Base\Middleware\Localization::class,
+        ]
+    ],
 
     /*
      * The disk on which to store added files.
@@ -23,13 +68,23 @@ return [
     'disk' => env('MIXPOST_DISK', 'public'),
 
     /*
+     * Features status
+     */
+    'features' => [
+        'forgot_password' => env('MIXPOST_FORGOT_PASSWORD', true),
+        'two_factor_auth' => env('MIXPOST_TWO_FACTOR_AUTH', true),
+        'api_access_tokens' => env('MIXPOST_API_ACCESS_TOKENS', true),
+        'auto_subscribe_post_activities' => env('MIXPOST_AUTO_SUBSCRIBE_POST_ACTIVITIES', false),
+    ],
+
+    /*
      * Indicate that the uploaded file should be no more than the given number of kilobytes.
      * Adding a larger file will result in an exception.
      */
     'max_file_size' => [
-        'image' => 1024 * 5, // 5MB
-        'gif' => 1024 * 15, // 15MB
-        'video' => 1024 * 200 // 200MB
+        'image' => env('MIXPOST_MAX_IMAGE_FILE_SIZE', 1024 * 15), // 15MB
+        'gif' => env('MIXPOST_MAX_GIF_FILE_SIZE', 1024 * 15), // 15MB
+        'video' => env('MIXPOST_MAX_VIDEO_FILE_SIZE', 1024 * 200), // 200MB
     ],
 
     /*
@@ -77,6 +132,9 @@ return [
     'external_media_terms' => ['social', 'mix', 'content', 'popular', 'viral', 'trend', 'light', 'marketing', 'self-hosted', 'ambient', 'writer', 'technology'],
 
     /*
+     * @deprecated This config will be removed on next major release.
+     * !!! Do not change anything here !!!
+     *
      * Options for each social network
      * We recommend leaving these options unchanged
      * You only change them when the API policy of the social networks changes, and you know what you are doing.
@@ -112,6 +170,16 @@ return [
                 'allow_mixing' => false,
             ]
         ],
+        'instagram' => [
+            'simultaneous_posting_on_multiple_accounts' => true,
+            'post_character_limit' => 2200,
+            'media_limit' => [
+                'photos' => 10,
+                'videos' => 1,
+                'gifs' => 0,
+                'allow_mixing' => true,
+            ]
+        ],
         'mastodon' => [
             'simultaneous_posting_on_multiple_accounts' => true,
             'post_character_limit' => 500,
@@ -121,6 +189,84 @@ return [
                 'gifs' => 1,
                 'allow_mixing' => false,
             ]
-        ]
+        ],
+        'youtube' => [
+            'simultaneous_posting_on_multiple_accounts' => true,
+            'post_character_limit' => 5000,
+            'media_limit' => [
+                'photos' => 0,
+                'videos' => 1,
+                'gifs' => 0,
+                'allow_mixing' => false,
+            ]
+        ],
+        'pinterest' => [
+            'simultaneous_posting_on_multiple_accounts' => true,
+            'post_character_limit' => 500,
+            'media_limit' => [
+                'photos' => 1,
+                'videos' => 0,
+                'gifs' => 0,
+                'allow_mixing' => false,
+            ]
+        ],
+        'linkedin' => [
+            'simultaneous_posting_on_multiple_accounts' => false,
+            'post_character_limit' => 3000,
+            'media_limit' => [
+                'photos' => 9,
+                'videos' => 1,
+                'gifs' => 1,
+                'allow_mixing' => false,
+            ]
+        ],
+        'linkedin_page' => [
+            'simultaneous_posting_on_multiple_accounts' => false,
+            'post_character_limit' => 3000,
+            'media_limit' => [
+                'photos' => 9,
+                'videos' => 1,
+                'gifs' => 1,
+                'allow_mixing' => false,
+            ]
+        ],
+        'tiktok' => [
+            'simultaneous_posting_on_multiple_accounts' => true,
+            'post_character_limit' => 2200,
+            'media_limit' => [
+                'photos' => 0,
+                'videos' => 1,
+                'gifs' => 0,
+                'allow_mixing' => false,
+            ]
+        ],
     ],
+
+    /*
+     * The locale determines the default locale that will be used by the Mixpost
+     * package to display all language strings. You are free to set this value
+     * to any of the locales which will be supported by the application.
+     */
+    'default_locale' => env('MIXPOST_DEFAULT_LOCALE', 'en-GB'),
+
+    /*
+     * The available locales for the Mixpost
+     */
+    'locales' => [
+        ['short' => 'ar', 'long' => 'ar-SA', 'direction' => 'rtl', 'english' => 'Arabic (Saudi Arabia)', 'native' => 'العربية (المملكة العربية السعودية)'],
+        ['short' => 'ca', 'long' => 'ca-ES', 'direction' => 'ltr', 'english' => 'Catalan (Spain)', 'native' => 'Català (España)'],
+        ['short' => 'cs', 'long' => 'cs-CZ', 'direction' => 'ltr', 'english' => 'Czech (Czechia)', 'native' => 'Čeština (Česko)'],
+        ['short' => 'de', 'long' => 'de-DE', 'direction' => 'ltr', 'english' => 'German (Germany)', 'native' => 'Deutsch (Deutschland)'],
+        ['short' => 'en', 'long' => 'en-GB', 'direction' => 'ltr', 'english' => 'English (GB)', 'native' => 'English (GB)'],
+        ['short' => 'es', 'long' => 'es-ES', 'direction' => 'ltr', 'english' => 'Spanish (Spain)', 'native' => 'Español (España)'],
+        ['short' => 'es', 'long' => 'es-MX', 'direction' => 'ltr', 'english' => 'Spanish (Mexico)', 'native' => 'Español (México)'],
+        ['short' => 'eu', 'long' => 'eu-ES', 'direction' => 'ltr', 'english' => 'Basque (Spain)', 'native' => 'Euskara (Espainia)'],
+        ['short' => 'fr', 'long' => 'fr-CA', 'direction' => 'ltr', 'english' => 'French (Canada)', 'native' => 'Français (Canada)'],
+        ['short' => 'fr', 'long' => 'fr-FR', 'direction' => 'ltr', 'english' => 'French (France)', 'native' => 'Français (France)'],
+        ['short' => 'it', 'long' => 'it-IT', 'direction' => 'ltr', 'english' => 'Italian (Italy)', 'native' => 'Italiano (Italia)'],
+        ['short' => 'ro', 'long' => 'ro-RO', 'direction' => 'ltr', 'english' => 'Romanian (Romania)', 'native' => 'Română (Romania)'],
+        ['short' => 'ru', 'long' => 'ru-RU', 'direction' => 'ltr', 'english' => 'Russian (Russia)', 'native' => 'Русский (Россия)'],
+        ['short' => 'sk', 'long' => 'sk-SK', 'direction' => 'ltr', 'english' => 'Slovak (Slovakia)', 'native' => 'Slovenčina (Slovensko)'],
+    ]
 ];
+

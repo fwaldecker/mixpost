@@ -1,5 +1,6 @@
 <script setup>
 import {computed, ref} from "vue";
+import { useI18n } from "vue-i18n";
 import usePost from "@/Composables/usePost";
 import usePostVersions from "@/Composables/usePostVersions";
 import Dropdown from "@/Components/Dropdown/Dropdown.vue";
@@ -15,6 +16,8 @@ import DangerButton from "@/Components/Button/DangerButton.vue"
 import PureButton from "@/Components/Button/PureButton.vue"
 import PlusIcon from "@/Icons/Plus.vue"
 import XIcon from "@/Icons/X.vue"
+
+const { t: $t } = useI18n()
 
 const props = defineProps({
     versions: {
@@ -46,18 +49,14 @@ const availableAccounts = computed(() => {
     })
 });
 
-const nameOfLastAvailableAccount = computed(() => {
-    if (availableAccounts.value.length === 1) {
-        return availableAccounts.value[0].name;
-    }
-
-    return null;
+const namesOfAvailableAccounts = computed(() => {
+    return availableAccounts.value.map(account => `${account.name}(${account.provider})`).join("\n");
 });
 
 const {getOriginalVersion} = usePostVersions();
 
 const versionsWithAccountData = computed(() => {
-    const defaultVersion = {...getOriginalVersion(props.versions), ...{account: {name: 'Original'}}};
+    const defaultVersion = {...getOriginalVersion(props.versions), ...{account: {name: $t("post.original")}}};
 
     const versionsBelongsToAccount = props.versions.map((version) => {
         const account = props.accounts.find(account => account.id === version.account_id);
@@ -86,14 +85,14 @@ const remove = () => {
 <template>
     <div>
         <div class="flex flex-wrap items-start">
-            <Tabs class="mr-xs">
+            <Tabs class="mr-xs items-center">
                 <template v-for="(version, index) in versionsWithAccountData" :key="version.account_id">
                     <Tab @click="$emit('select', version.account_id)" :active="activeVersion === version.account_id"
                          :tab-index="index" class="relative mb-xs group">
                         <ProviderIcon v-if="!version.is_original" :provider="version.account.provider"
                                       :class="['w-4!', 'h-4!']" class="mr-xs"/>
-                        <span v-if="version.is_original && nameOfLastAvailableAccount"
-                              v-tooltip="nameOfLastAvailableAccount"
+                        <span v-if="version.is_original && namesOfAvailableAccounts"
+                              v-tooltip="namesOfAvailableAccounts"
                               class="mr-xs">{{ version.account.name }}</span>
 
                         <span v-else class="mr-xs">{{ version.account.name }}</span>
@@ -107,54 +106,54 @@ const remove = () => {
                         </div>
                     </Tab>
                 </template>
-            </Tabs>
 
-            <template v-if="editAllowed && availableAccounts.length > 1">
-                <Dropdown width-classes="w-64">
-                    <template #trigger>
-                        <PureButton v-tooltip="'Create version'">
-                            <PlusIcon/>
-                        </PureButton>
-                    </template>
+                <template v-if="editAllowed && availableAccounts.length > 1">
+                    <Dropdown width-classes="w-64">
+                        <template #trigger>
+                            <PureButton v-tooltip="$t('post.create_version') ">
+                                <PlusIcon/>
+                            </PureButton>
+                        </template>
 
-                    <template #header>
-                        <div class="font-semibold">Create version for</div>
-                    </template>
+                        <template #header>
+                            <div class="font-semibold">{{ $t('post.create_version_for') }}</div>
+                        </template>
 
-                    <template #content>
-                        <VerticallyScrollableContent max-height="xl">
-                            <template v-for="account in availableAccounts">
-                                <DropdownItem @click="$emit('add', account.id)" as="button">
+                        <template #content>
+                            <VerticallyScrollableContent max-height="xl">
+                                <template v-for="account in availableAccounts" :key="account.id">
+                                    <DropdownItem @click="$emit('add', account.id)" as="button">
                                   <span class="mr-xs">
                                       <Account :provider="account.provider"
+                                               :name="account.name"
                                                :img-url="account.image"
                                                :active="true"/>
                                   </span>
-                                    <span class="text-left">{{ account.name }}</span>
-                                </DropdownItem>
-                            </template>
-                        </VerticallyScrollableContent>
-                    </template>
-                </Dropdown>
-            </template>
+                                        <span class="text-left">{{ account.name }}</span>
+                                    </DropdownItem>
+                                </template>
+                            </VerticallyScrollableContent>
+                        </template>
+                    </Dropdown>
+                </template>
+            </Tabs>
         </div>
 
         <ConfirmationModal :show="confirmationRemoval !== null"
                            @close="closeConfirmationRemoval"
                            variant="danger">
             <template #header>
-                Remove version
+                {{ $t('post.remove_version') }}
             </template>
             <template #body>
               <span v-if="confirmationRemoval">
-                  Are you sure you would like to delete version for  <span class="capitalize">[{{
-                      confirmationRemoval.account.provider
-                  }}]</span> {{ confirmationRemoval.account.name }}?
+                {{ $t('post.confirmation_delete_version', {'account_name': confirmationRemoval.account.name, 'account_provider' : confirmationRemoval.account.provider })}}
               </span>
             </template>
             <template #footer>
-                <SecondaryButton @click="closeConfirmationRemoval" class="mr-xs">Cancel</SecondaryButton>
-                <DangerButton @click="remove">Remove</DangerButton>
+                <SecondaryButton @click="closeConfirmationRemoval" class="mr-xs"> {{ $t('general.cancel') }}
+                </SecondaryButton>
+                <DangerButton @click="remove">{{ $t('general.remove') }}</DangerButton>
             </template>
         </ConfirmationModal>
     </div>

@@ -36,9 +36,9 @@ class TwitterService extends Service
     public static function formMessages(): array
     {
         return [
-            'client_id' => 'The API Key is required.',
-            'client_secret' => 'The API Secret is required.',
-            'tier' => 'Tier is invalid.'
+            'client_id' => __('validation.required', ['attribute' => 'API Key']),
+            'client_secret' => __('validation.required', ['attribute' => 'API Secret']),
+            'tier' => __('validation.in', ['attribute' => 'Tier'])
         ];
     }
 }

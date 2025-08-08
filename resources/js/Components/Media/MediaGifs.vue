@@ -1,6 +1,7 @@
 <script setup>
-import {computed, onMounted} from "vue";
+import {computed, inject, onMounted} from "vue";
 import {usePage, Link} from "@inertiajs/vue3";
+import useAuth from "../../Composables/useAuth";
 import useMedia from "@/Composables/useMedia";
 import MediaSelectable from "@/Components/Media/MediaSelectable.vue";
 import MediaFile from "@/Components/Media/MediaFile.vue";
@@ -11,12 +12,20 @@ import NoResult from "@/Components/Util/NoResult.vue";
 import Alert from "@/Components/Util/Alert.vue";
 import PrimaryButton from "@/Components/Button/PrimaryButton.vue";
 
+const workspaceCtx = inject('workspaceCtx');
+
 const props = defineProps({
     columns: {
         type: Number,
         default: 3
+    },
+    maxSelectedItems: {
+        type: Number,
+        default: -1 //infinite
     }
 })
+
+const {user} = useAuth();
 
 const enabled = computed(() => {
     return usePage().props.is_configured_service.tenor;
@@ -33,7 +42,7 @@ const {
     deselectAll,
     isSelected,
     createObserver
-} = useMedia('mixpost.media.fetchGifs');
+} = useMedia('mixpost.media.fetchGifs', {workspace: workspaceCtx.id}, props.maxSelectedItems);
 
 onMounted(() => {
     if (enabled.value) {
@@ -45,7 +54,7 @@ defineExpose({selected, deselectAll})
 </script>
 <template>
     <div v-if="enabled">
-        <SearchInput v-model="keyword" placeholder="Search Tenor GIFs"/>
+        <SearchInput v-model="keyword" :placeholder="$t('service.tenor.search_gifs')"/>
 
         <div v-if="items.length" class="mt-lg">
             <Masonry :items="items" :columns="columns">
@@ -53,7 +62,7 @@ defineExpose({selected, deselectAll})
                     <MediaSelectable v-if="item" :active="isSelected(item)" @click="toggleSelect(item)">
                         <MediaFile :media="item" :key="item.id" class="group">
                             <MediaCredit>
-                                GIF from Tenor
+                                {{ $t('service.tenor.gif') }}
                             </MediaCredit>
                         </MediaFile>
                     </MediaSelectable>
@@ -61,18 +70,20 @@ defineExpose({selected, deselectAll})
             </Masonry>
         </div>
 
-        <NoResult v-if="isLoaded && !items.length" class="mt-lg">No GIFs found.</NoResult>
+        <NoResult v-if="isLoaded && !items.length" class="mt-lg">{{ $t('media.no_gifs_found') }}</NoResult>
 
         <div ref="endlessPagination" class="-z-10 w-full"/>
     </div>
 
     <template v-if="!enabled">
         <Alert variant="warning" :closeable="false">
-            You have not configured Tenor service.
+            {{ $t('service.not_configured_service', {service: 'Tenor'}) }}
         </Alert>
 
-        <Link :href="route('mixpost.services.index')" class="block mt-md">
-            <PrimaryButton>Click to configure</PrimaryButton>
-        </Link>
+        <template v-if="user.is_admin">
+            <Link :href="route('mixpost.services.index')" class="block mt-md">
+                <PrimaryButton> {{ $t('media.click_configure') }}</PrimaryButton>
+            </Link>
+        </template>
     </template>
 </template>

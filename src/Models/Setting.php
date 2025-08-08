@@ -10,6 +10,7 @@ class Setting extends Model
     public $table = 'mixpost_settings';
 
     protected $fillable = [
+        'user_id',
         'name',
         'payload'
     ];

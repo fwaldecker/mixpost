@@ -2,12 +2,11 @@
 
 namespace Inovector\Mixpost\Rules;
 
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Hash;
 
-class CheckUserPasswordRule implements Rule
+class CheckUserPasswordRule implements ValidationRule
 {
     public $user;
     public ?string $message;
@@ -18,13 +17,10 @@ class CheckUserPasswordRule implements Rule
         $this->message = $message;
     }
 
-    public function passes($attribute, $value): bool
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        return Hash::check($value, $this->user->password);
-    }
-
-    public function message(): array|string|Translator|Application|null
-    {
-        return $this->message ?: trans('validation.password');
+        if (!Hash::check($value, $this->user->password)) {
+            $fail($this->message ?: trans('validation.password'));
+        }
     }
 }

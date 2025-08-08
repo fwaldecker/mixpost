@@ -44,24 +44,26 @@ const clear = () => {
 </script>
 <template>
     <div class="flex items-center">
-        <SearchInput v-model="modelValue.keyword" class="mr-2"/>
+        <SearchInput v-model="modelValue.keyword" class="mr-xs rtl:mr-0 rtl:ml-xs"/>
 
         <Dropdown width-classes="w-72" placement="bottom-end" :closeable-on-content="false">
             <template #trigger>
-                <PrimaryButton size="md">
-                    <FunnelIcon/>
-                    <span class="ml-xs hidden sm:inline-block">Filters <span v-if="total" class="px-2 py-1 rounded-md bg-white text-black font-bold">{{ total }}</span></span>
+                <PrimaryButton size="md" :hiddenTextOnSmallScreen="true">
+                    <template #icon>
+                        <FunnelIcon/>
+                    </template>
+                    <span>{{ $t('general.filters') }} <span v-if="total" class="px-2 py-1 rounded-md bg-white text-black font-bold">{{ total }}</span></span>
                 </PrimaryButton>
             </template>
 
             <template #header>
-                <PureButton @click="clear">Clear filter</PureButton>
+                <PureButton @click="clear">{{ $t('general.clear_filter') }}</PureButton>
             </template>
 
             <template #content>
                 <VerticallyScrollableContent>
                     <div class="p-sm">
-                        <div class="font-semibold">Labels</div>
+                        <div class="font-semibold">{{ $t('post.labels') }}</div>
                         <div v-if="tags.length" class="mt-sm flex flex-wrap items-center gap-xs">
                             <template v-for="tag in tags" :key="tag.id">
                                 <label class="flex items-center cursor-pointer">
@@ -71,12 +73,12 @@ const clear = () => {
                             </template>
                         </div>
                         <div v-else>
-                            <NoResult class="mt-xs">No labels found</NoResult>
+                            <NoResult class="mt-xs">{{ $t('tag.no_labels_found') }}</NoResult>
                         </div>
                     </div>
 
                     <div class="p-sm mt-sm">
-                        <div class="font-semibold">Accounts</div>
+                        <div class="font-semibold">{{ $t('account.accounts') }}</div>
                         <div v-if="accounts.length" class="mt-sm flex flex-wrap items-center gap-xs">
                             <template v-for="account in accounts" :key="account.id">
                                 <label class="flex items-center cursor-pointer">
@@ -90,7 +92,7 @@ const clear = () => {
                             </template>
                         </div>
                         <div v-else>
-                            <NoResult class="mt-xs">No accounts found</NoResult>
+                            <NoResult class="mt-xs">{{ $t('account.no_accounts_found') }}</NoResult>
                         </div>
                     </div>
                 </VerticallyScrollableContent>

@@ -6,5 +6,6 @@ enum ServiceGroup: string
 {
     case MISCELLANEOUS = 'miscellaneous';
     case SOCIAL = 'social';
+    case AI = 'ai';
     case MEDIA = 'media';
 }

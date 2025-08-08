@@ -1,5 +1,5 @@
 <script setup>
-import {startOfMonth, addMonths, parseISO, subMonths} from "date-fns";
+import { startOfMonth, addMonths, parseISO, subMonths } from "date-fns";
 import SecondaryButton from "@/Components/Button/SecondaryButton.vue"
 import PureButton from "@/Components/Button/PureButton.vue"
 import ChevronRightIcon from "@/Icons/ChevronRight.vue"
@@ -35,14 +35,14 @@ const selectNext = () => {
 </script>
 <template>
     <div class="flex items-center">
-        <SecondaryButton @click="selectCurrent" class="mr-xs">Today</SecondaryButton>
+        <SecondaryButton @click="selectCurrent" class="mr-xs"> {{ $t("calendar.today") }}</SecondaryButton>
 
         <div class="flex items-center">
             <PureButton @click="selectPrevious" class="mr-xs">
-                <ChevronLeftIcon/>
+                <ChevronLeftIcon />
             </PureButton>
             <PureButton @click="selectNext">
-                <ChevronRightIcon/>
+                <ChevronRightIcon />
             </PureButton>
         </div>
     </div>

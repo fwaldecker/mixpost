@@ -7,7 +7,7 @@ defineProps({
 })
 </script>
 <template>
-    <div class="bg-white border border-gray-100 rounded-lg group-hover:border-indigo-100 transition-colors ease-in-out duration-200">
+    <div class="bg-white border border-gray-100 rounded-lg group-hover:border-primary-100 transition-colors ease-in-out duration-200">
         <div :class="{'p-lg': withPadding}">
             <div v-if="$slots.title || $slots.action" class="flex items-center justify-between">
                 <div v-if="$slots.title"

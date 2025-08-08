@@ -1,7 +1,15 @@
+<script setup>
+defineProps({
+    contrasted: {
+        type: Boolean,
+        default: false
+    }
+})
+</script>
 <template>
     <div class="hidden sm:block">
         <div class="py-lg">
-            <div class="border-t border-gray-200 dark:border-slate-700"></div>
+            <div class="border-t" :class="{'border-gray-100': !contrasted, 'border-gray-200': contrasted}"></div>
         </div>
     </div>
 </template>

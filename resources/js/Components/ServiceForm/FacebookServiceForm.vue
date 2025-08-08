@@ -1,20 +1,23 @@
 <script setup>
+import {useI18n} from "vue-i18n";
 import {router} from "@inertiajs/vue3";
 import {ref} from "vue";
 import useNotifications from "@/Composables/useNotifications";
 import Panel from "@/Components/Surface/Panel.vue";
 import Input from "@/Components/Form/Input.vue";
-import Select from "@/Components/Form/Select.vue";
 import FacebookIcon from "@/Icons/Facebook.vue";
 import PrimaryButton from "@/Components/Button/PrimaryButton.vue";
-import HorizontalGroup from "@/Components/Layout/HorizontalGroup.vue";
 import Error from "@/Components/Form/Error.vue";
 import ReadDocHelp from "@/Components/Util/ReadDocHelp.vue";
+import Select from "../Form/Select.vue";
+import InputHidden from "../Form/InputHidden.vue";
 import Checkbox from "../Form/Checkbox.vue";
 import Flex from "../Layout/Flex.vue";
-import InputHidden from "../Form/InputHidden.vue";
-import LabelSuffix from "../Form/LabelSuffix.vue";
 import Label from "../Form/Label.vue";
+import LabelSuffix from "../Form/LabelSuffix.vue";
+import HorizontalGroup from "../Layout/HorizontalGroup.vue";
+
+const {t: $t} = useI18n()
 
 const props = defineProps({
     form: {
@@ -32,7 +35,7 @@ const save = () => {
     router.put(route('mixpost.services.update', {service: 'facebook'}), props.form, {
         preserveScroll: true,
         onSuccess() {
-            notify('success', 'Facebook service has been saved');
+            notify('success', $t('service.service_saved', {service: 'Facebook'}));
         },
         onError: (err) => {
             errors.value = err;
@@ -52,7 +55,7 @@ const save = () => {
         <template #description>
             <p>
                 <a href="https://developers.facebook.com/apps" class="link" target="_blank">
-                    Create an App on Facebook</a>.
+                    {{ $t('service.create_app', {name: 'Facebook'}) }}</a>.
             </p>
             <ReadDocHelp :href="`${$page.props.mixpost.docs_link}/services/social/facebook/`"
                          class="mt-xs"/>
@@ -60,9 +63,7 @@ const save = () => {
 
         <HorizontalGroup class="mt-lg">
             <template #title>
-                <label for="client_id">App ID
-                    <LabelSuffix danger>*</LabelSuffix>
-                </label>
+                <label for="client_id">App ID <LabelSuffix danger>*</LabelSuffix></label>
             </template>
 
             <Input v-model="form.configuration.client_id"
@@ -78,9 +79,7 @@ const save = () => {
 
         <HorizontalGroup class="mt-lg">
             <template #title>
-                <label for="client_secret">App secret
-                    <LabelSuffix danger>*</LabelSuffix>
-                </label>
+                <label for="client_secret">App secret <LabelSuffix danger>*</LabelSuffix></label>
             </template>
 
             <InputHidden v-model="form.configuration.client_secret"
@@ -118,12 +117,12 @@ const save = () => {
 
         <HorizontalGroup class="mt-lg">
             <template #title>
-                Status
+                {{ $t('general.status') }}
             </template>
 
             <Flex :responsive="false" class="items-center">
                 <Checkbox v-model:checked="form.active" id="active"/>
-                <Label for="active" class="mb-0!">Active</Label>
+                <Label for="active" class="mb-0!">{{ $t('general.active') }}</Label>
             </Flex>
 
             <template #footer>
@@ -131,6 +130,6 @@ const save = () => {
             </template>
         </HorizontalGroup>
 
-        <PrimaryButton @click="save" class="mt-lg">Save</PrimaryButton>
+        <PrimaryButton @click="save" class="mt-lg">{{ $t('general.save') }}</PrimaryButton>
     </Panel>
 </template>

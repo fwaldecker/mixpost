@@ -2,6 +2,7 @@
 
 namespace Inovector\Mixpost\SocialProviders\Mastodon\Concerns;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -21,7 +22,7 @@ trait ManagesResources
 
             return [
                 'id' => $data['id'],
-                'name' => $data['display_name'],
+                'name' => $data['display_name'] ?: $data['username'],
                 'username' => $data['username'],
                 'image' => $data['avatar'],
                 'data' => [
@@ -41,9 +42,17 @@ trait ManagesResources
 
         $postParameters = ['status' => $text];
 
+        if ($lastId = $params['last_id'] ?? null) {
+            $postParameters['in_reply_to_id'] = $lastId;
+        }
+
         $ids = $mediaResponse->ids;
         if (!empty($ids)) {
             $postParameters['media_ids'] = $ids;
+        }
+
+        if (Arr::get($params, 'sensitive', false)) {
+            $postParameters['sensitive'] = true;
         }
 
         $response = $this->getHttpClient()::withToken($this->getAccessToken()['access_token'])
@@ -70,7 +79,9 @@ trait ManagesResources
                 $this->getHttpClient()::timeout(60 * 10)
                     ->withToken($this->getAccessToken()['access_token'])
                     ->attach('file', $stream['stream'])
-                    ->post("$this->serverUrl/api/v2/media")
+                    ->post("$this->serverUrl/api/v2/media", [
+                        'description' => $item->alt_text
+                    ])
             );
 
             Util::closeAndDeleteStreamResource($stream);
@@ -89,7 +100,7 @@ trait ManagesResources
                 return $this->response(SocialProviderResponseStatus::ERROR, ['upload_failed']);
             }
 
-            if ($response->url) {
+            if (!$response->url) {
                 // Asynchronous processing
                 Util::performTaskWithDelay(function () use ($response) {
                     $media = $this->getMedia($response->id());

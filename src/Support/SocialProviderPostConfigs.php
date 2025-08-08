@@ -32,6 +32,8 @@ class SocialProviderPostConfigs implements JsonSerializable
 
     private array $allowMixingMediaTypes = ['default' => false];
 
+    private array $enableVideoThumb = ['default' => false];
+
     private array $mediaTextRequirementOperator = ['default' => 'or']; // or, and
 
     public function simultaneousPosting(bool $value): SocialProviderPostConfigs
@@ -104,6 +106,13 @@ class SocialProviderPostConfigs implements JsonSerializable
         return $this;
     }
 
+    public function enableVideoThumb(?bool $value = null, string $type = 'default'): SocialProviderPostConfigs
+    {
+        $this->setConfigArrayValue($this->enableVideoThumb, $value, $type);
+
+        return $this;
+    }
+
     public function mediaTextRequirementOperator(?string $value = null, string $type = 'default'): SocialProviderPostConfigs
     {
         $this->setConfigArrayValue($this->mediaTextRequirementOperator, $value, $type);
@@ -137,6 +146,7 @@ class SocialProviderPostConfigs implements JsonSerializable
                     'allow_mixing' => $this->allowMixingMediaTypes,
                 ],
             ],
+            'enable_video_thumb' => $this->enableVideoThumb,
             'media_text_requirement_operator' => $this->mediaTextRequirementOperator,
         ];
     }

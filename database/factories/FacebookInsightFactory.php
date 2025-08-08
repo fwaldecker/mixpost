@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Inovector\Mixpost\Enums\FacebookInsightType;
 use Inovector\Mixpost\Models\Account;
 use Inovector\Mixpost\Models\FacebookInsight;
+use Inovector\Mixpost\Models\Workspace;
 
 class FacebookInsightFactory extends Factory
 {
@@ -14,6 +15,7 @@ class FacebookInsightFactory extends Factory
     public function definition()
     {
         return [
+            'workspace_id' => Workspace::factory(),
             'account_id' => Account::factory()->state([
                 'provider' => 'facebook_page'
             ]),
